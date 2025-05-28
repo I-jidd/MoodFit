@@ -67,7 +67,7 @@
                         android:id="@+id/tv_exercise_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Start in plank position with hands slightly wider than shoulders. Lower your body until chest nearly touches floor, then push back up. Keep core tight throughout movement."
+                        android:text="Start in plankd position with hands slightly wider than shoulders. Lower your body until chest nearly touches floor, then push back up. Keep core tight throughout movement."
                         android:textSize="16sp"
                         android:textColor="@color/text_secondary"
                         android:lineSpacing="1.3"
