@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_primary"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Workout Timer"
+        android:textSize="28sp"
+        android:textColor="@color/text_primary"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/barlow_semibold" />
+
+    <!-- Timer Selection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="40dp">
+
+        <Button
+            android:id="@+id/btn_30_sec"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="30 sec"
+            android:textSize="16sp"
+            android:background="@drawable/timer_option_selector"
+            android:textColor="@color/timer_text_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/barlow_semibold" />
+
+        <Button
+            android:id="@+id/btn_60_sec"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="60 sec"
+            android:textSize="16sp"
+            android:background="@drawable/timer_option_selector"
+            android:textColor="@color/timer_text_selector"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/barlow_semibold" />
+
+    </LinearLayout>
+
+    <!-- Large Timer Display -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="48dp"
+        app:cardCornerRadius="125dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@color/timer_background">
+
+            <TextView
+                android:id="@+id/tv_timer_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:30"
+                android:textSize="48sp"
+                android:textColor="@color/timer_text"
+                android:textStyle="bold"
+                android:fontFamily="@font/barlow_semibold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="seconds"
+                android:textSize="16sp"
+                android:textColor="@color/timer_text_secondary"
+                android:fontFamily="@font/opensans_regular" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Control Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Start"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:background="@drawable/start_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/barlow_semibold" />
+
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:text="Pause"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:background="@drawable/pause_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/barlow_semibold" />
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Reset"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:background="@drawable/reset_button_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/barlow_semibold" />
+
+    </LinearLayout>
+
+    <!-- Sound Toggle -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_sound"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Sound icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sound alerts"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="12dp"
+            android:fontFamily="@font/opensans_regular" />
+
+        <Switch
+            android:id="@+id/switch_sound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:thumb="@drawable/switch_thumb"
+            android:track="@drawable/switch_track" />
+
+    </LinearLayout>
+
+</LinearLayout>
