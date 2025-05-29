@@ -1,4 +1,6 @@
 package com.example.moodfit.activities;
 
-public class WorkoutTimerActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class WorkoutTimerActivity extends AppCompatActivity {
 }
