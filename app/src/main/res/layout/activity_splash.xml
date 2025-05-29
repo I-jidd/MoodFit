@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/splash_gradient_background"
+    android:gravity="center"
+    android:padding="32dp">
+
+    <!-- Top Spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
+
+    <!-- App Logo Container -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <!-- Logo Icon -->
+        <ImageView
+            android:id="@+id/iv_app_logo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_moodfit_logo"
+            android:contentDescription="MoodFit app logo"
+            android:layout_marginBottom="16dp" />
+
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/tv_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MoodFit"
+            android:textSize="42sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:fontFamily="@font/barlow_semibold"
+            android:letterSpacing="0.02"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/tv_tagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fitness for Every Mood"
+            android:textSize="18sp"
+            android:textColor="@color/splash_text_secondary"
+            android:fontFamily="@font/opensans_regular"
+            android:alpha="0.9" />
+
+    </LinearLayout>
+
+    <!-- Middle Spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2" />
+
+    <!-- Loading Indicator -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="32dp">
+
+        <ProgressBar
+            android:id="@+id/progress_loading"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:indeterminateTint="@color/white"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Getting ready..."
+            android:textSize="14sp"
+            android:textColor="@color/splash_text_secondary"
+            android:fontFamily="@font/opensans_regular"
+            android:alpha="0.8" />
+
+    </LinearLayout>
+
+    <!-- Bottom Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Motivational Icons Row -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_fitness_splash"
+                android:contentDescription="Fitness icon"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.7" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_heart_splash"
+                android:contentDescription="Health icon"
+                android:layout_marginEnd="16dp"
+                android:alpha="0.7" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_target_splash"
+                android:contentDescription="Goal icon"
+                android:alpha="0.7" />
+
+        </LinearLayout>
+
+        <!-- Version Info -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Version 1.0"
+            android:textSize="12sp"
+            android:textColor="@color/splash_text_secondary"
+            android:fontFamily="@font/opensans_regular"
+            android:alpha="0.6" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Background Circle -->
+    <path
+        android:fillColor="@color/white"
+        android:pathData="M60,10C32.4,10 10,32.4 10,60s22.4,50 50,50s50,-22.4 50,-50S87.6,10 60,10z" />
+
+    <!-- Inner Gradient Circle -->
+    <path
+        android:fillColor="@color/accent_color"
+        android:pathData="M60,20C38,20 20,38 20,60s18,40 40,40s40,-18 40,-40S82,20 60,20z" />
+
+    <!-- Fitness Dumbbell Icon -->
+    <path
+        android:fillColor="@color/white"
+        android:pathData="M45,45h30v10h-8v10h-14v-10h-8zM41,41h4v18h-4zM75,41h4v18h-4z" />
+
+    <!-- Heart/Mood Icon -->
+    <path
+        android:fillColor="@color/primary_light"
+        android:pathData="M60,75c-1.5,0 -3,-0.6 -4.1,-1.7L40.7,58.1c-2.2,-2.2 -2.2,-5.8 0,-8c2.2,-2.2 5.8,-2.2 8,0L60,61.4l11.3,-11.3c2.2,-2.2 5.8,-2.2 8,0c2.2,2.2 2.2,5.8 0,8L64.1,73.3C63,74.4 61.5,75 60,75z" />
+
+</vector>
