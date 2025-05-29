@@ -1,4 +1,6 @@
 package com.example.moodfit.activities;
 
-public class HomeActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class HomeActivity extends AppCompatActivity {
 }

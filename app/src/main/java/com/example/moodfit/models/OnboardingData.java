@@ -14,7 +14,7 @@ public class OnboardingData {
     private List<WorkoutCategory> preferredCategories;
     private boolean onboardingCompleted;
     private int currentStep;
-    private static final int TOTAL_STEPS = 4;
+    public static final int TOTAL_STEPS = 4;
 
     // Steps: 1=Username, 2=Difficulty, 3=Preferences, 4=Categories
     public static final int STEP_USERNAME = 1;

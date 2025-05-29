@@ -1,4 +1,6 @@
 package com.example.moodfit.activities;
 
-public class ProgressStreakActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class ProgressStreakActivity extends AppCompatActivity {
 }
