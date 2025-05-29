@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="1000"
+    android:fillAfter="true">
+    <objectAnimator
+        android:propertyName="scaleX"
+        android:duration="800"
+        android:valueTo="1.0"
+        android:valueFrom="0.3"
+        android:valueType="floatType"
+        android:interpolator="@android:anim/bounce_interpolator" />
+    <objectAnimator
+        android:propertyName="scaleY"
+        android:duration="800"
+        android:valueTo="1.0"
+        android:valueFrom="0.3"
+        android:valueType="floatType"
+        android:interpolator="@android:anim/bounce_interpolator" />
+    <objectAnimator
+        android:propertyName="alpha"
+        android:duration="600"
+        android:valueTo="1.0"
+        android:valueFrom="0.0"
+        android:valueType="floatType"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+    <objectAnimator
+        android:propertyName="rotation"
+        android:duration="800"
+        android:valueTo="0"
+        android:valueFrom="180"
+        android:valueType="floatType"
+        android:interpolator="@android:anim/decelerate_interpolator" />
+</set>
