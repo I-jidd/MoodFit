@@ -1,28 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="120dp"
-    android:height="120dp"
-    android:viewportWidth="120"
-    android:viewportHeight="120">
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Background circle -->
+    <path
+        android:fillColor="@color/primary_color"
+        android:pathData="M24,24m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0"/>
 
-    <!-- Background Circle -->
+    <!-- Inner design elements -->
+    <!-- Heart representing mood -->
     <path
         android:fillColor="@color/white"
-        android:pathData="M60,10C32.4,10 10,32.4 10,60s22.4,50 50,50s50,-22.4 50,-50S87.6,10 60,10z" />
+        android:pathData="M24,32l-2.9,-2.64C15.8,24.72 12,21.28 12,17c0,-3.08 2.42,-5.5 5.5,-5.5 1.74,0 3.41,0.81 4.5,2.09C23.09,11.81 24.76,11 26.5,11 29.58,11 32,13.42 32,17c0,4.28 -3.8,7.72 -8.9,12.36L24,32z"/>
 
-    <!-- Inner Gradient Circle -->
+    <!-- Fitness elements -->
     <path
         android:fillColor="@color/accent_color"
-        android:pathData="M60,20C38,20 20,38 20,60s18,40 40,40s40,-18 40,-40S82,20 60,20z" />
+        android:pathData="M18,20h2v2h2v-2h2v-2h-2v-2h-2v2h-2v2z"/>
 
-    <!-- Fitness Dumbbell Icon -->
+    <!-- Motion lines -->
     <path
-        android:fillColor="@color/white"
-        android:pathData="M45,45h30v10h-8v10h-14v-10h-8zM41,41h4v18h-4zM75,41h4v18h-4z" />
-
-    <!-- Heart/Mood Icon -->
+        android:fillColor="@color/accent_light"
+        android:pathData="M12,24h4v2h-4z"/>
     <path
-        android:fillColor="@color/primary_light"
-        android:pathData="M60,75c-1.5,0 -3,-0.6 -4.1,-1.7L40.7,58.1c-2.2,-2.2 -2.2,-5.8 0,-8c2.2,-2.2 5.8,-2.2 8,0L60,61.4l11.3,-11.3c2.2,-2.2 5.8,-2.2 8,0c2.2,2.2 2.2,5.8 0,8L64.1,73.3C63,74.4 61.5,75 60,75z" />
-
+        android:fillColor="@color/accent_light"
+        android:pathData="M32,24h4v2h-4z"/>
 </vector>

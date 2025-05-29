@@ -35,7 +35,7 @@
         android:clickable="true"
         android:focusable="true"
         android:fontFamily="@font/barlow_semibold"
-        android:stateListAnimator="@anim/button_bounce" />
+        android:stateListAnimator="@animator/button_bounce" />
 
     <!-- Exercise Display Card -->
     <androidx.cardview.widget.CardView
