@@ -35,7 +35,7 @@
         android:clickable="true"
         android:focusable="true"
         android:fontFamily="@font/barlow_semibold"
-        android:stateListAnimator="@animator/button_bounce" />
+        android:stateListAnimator="@anim/button_bounce" />
 
     <!-- Exercise Display Card -->
     <androidx.cardview.widget.CardView
@@ -63,7 +63,7 @@
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"
                 android:gravity="center"
-                android:lineSpacing="1.3"
+                android:lineSpacingMultiplier="1.2"
                 android:fontFamily="@font/barlow_semibold" />
 
         </LinearLayout>

@@ -97,7 +97,7 @@
                 android:textSize="18sp"
                 android:textColor="@color/text_primary"
                 android:gravity="center"
-                android:lineSpacing="1.2"
+                android:lineSpacingMultiplier="1.2"
                 android:fontFamily="@font/opensans_regular" />
 
         </LinearLayout>
