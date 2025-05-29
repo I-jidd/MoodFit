@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -19,6 +21,7 @@ import com.example.moodfit.R;
 import com.example.moodfit.models.OnboardingData;
 import com.example.moodfit.models.User;
 import com.example.moodfit.models.enums.DifficultyLevel;
+import com.example.moodfit.models.enums.WorkoutCategory;
 import com.example.moodfit.utils.SharedPreferencesHelper;
 import com.example.moodfit.utils.ValidationUtils;
 
@@ -40,7 +43,8 @@ public class UsernameSetupActivity extends AppCompatActivity {
 
     // UI Components - Step Containers
     private FrameLayout stepContentContainer;
-    private LinearLayout stepUsername, stepDifficulty;
+    private LinearLayout stepUsername;
+    private ScrollView stepDifficulty,stepPreferences, stepCategories;
 
     // UI Components - Navigation
     private Button btnSkip, btnBack, btnNext;
@@ -52,6 +56,12 @@ public class UsernameSetupActivity extends AppCompatActivity {
     // UI Components - Difficulty Step
     private CardView cardBeginner, cardIntermediate, cardAdvanced;
     private ImageView checkBeginner, checkIntermediate, checkAdvanced;
+
+    // UI Components - Preferences Step
+    private Switch switchSoundPreference, switchNotificationPreference;
+
+    // UI Components - Categories Step
+    private CardView cardCardio, cardStrength, cardFlexibility, cardYoga, cardHiit, cardBreathing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +102,12 @@ public class UsernameSetupActivity extends AppCompatActivity {
         stepIndicator3 = findViewById(R.id.step_indicator_3);
         stepIndicator4 = findViewById(R.id.step_indicator_4);
 
-        // Step Containers
+        // Step Containers - UPDATED TO MATCH XML STRUCTURE
         stepContentContainer = findViewById(R.id.step_content_container);
-        stepUsername = findViewById(R.id.step_username);
-        stepDifficulty = findViewById(R.id.step_difficulty);
+        stepUsername = findViewById(R.id.step_username);                    // LinearLayout
+        stepDifficulty = findViewById(R.id.step_difficulty);              // ScrollView
+        stepPreferences = findViewById(R.id.step_preferences);            // ScrollView
+        stepCategories = findViewById(R.id.step_categories);              // ScrollView
 
         // Navigation Buttons
         btnSkip = findViewById(R.id.btn_skip);
@@ -113,6 +125,18 @@ public class UsernameSetupActivity extends AppCompatActivity {
         checkBeginner = findViewById(R.id.check_beginner);
         checkIntermediate = findViewById(R.id.check_intermediate);
         checkAdvanced = findViewById(R.id.check_advanced);
+
+        // Preferences Step Components
+        switchSoundPreference = findViewById(R.id.switch_sound_preference);
+        switchNotificationPreference = findViewById(R.id.switch_notification_preference);
+
+        // Categories Step Components
+        cardCardio = findViewById(R.id.card_cardio);
+        cardStrength = findViewById(R.id.card_strength);
+        cardFlexibility = findViewById(R.id.card_flexibility);
+        cardYoga = findViewById(R.id.card_yoga);
+        cardHiit = findViewById(R.id.card_hiit);
+        cardBreathing = findViewById(R.id.card_breathing);
     }
 
     /**
@@ -129,6 +153,12 @@ public class UsernameSetupActivity extends AppCompatActivity {
 
         // Difficulty selection listeners
         setupDifficultySelectionListeners();
+
+        // Preferences listeners
+        setupPreferencesListeners();
+
+        // Categories selection listeners
+        setupCategoriesListeners();
     }
 
     /**
@@ -188,6 +218,33 @@ public class UsernameSetupActivity extends AppCompatActivity {
     }
 
     /**
+     * Setup preferences listeners
+     */
+    private void setupPreferencesListeners() {
+        switchSoundPreference.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            onboardingData.setSoundPreference(isChecked);
+            updateNextButtonState();
+        });
+
+        switchNotificationPreference.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            onboardingData.setNotificationPreference(isChecked);
+            updateNextButtonState();
+        });
+    }
+
+    /**
+     * Setup categories selection listeners
+     */
+    private void setupCategoriesListeners() {
+        cardCardio.setOnClickListener(v -> toggleCategory(WorkoutCategory.CARDIO, cardCardio));
+        cardStrength.setOnClickListener(v -> toggleCategory(WorkoutCategory.STRENGTH, cardStrength));
+        cardFlexibility.setOnClickListener(v -> toggleCategory(WorkoutCategory.FLEXIBILITY, cardFlexibility));
+        cardYoga.setOnClickListener(v -> toggleCategory(WorkoutCategory.YOGA, cardYoga));
+        cardHiit.setOnClickListener(v -> toggleCategory(WorkoutCategory.HIIT, cardHiit));
+        cardBreathing.setOnClickListener(v -> toggleCategory(WorkoutCategory.BREATHING, cardBreathing));
+    }
+
+    /**
      * Handle difficulty level selection
      */
     private void selectDifficulty(DifficultyLevel difficulty) {
@@ -203,6 +260,35 @@ public class UsernameSetupActivity extends AppCompatActivity {
 
         // Update next button state
         updateNextButtonState();
+    }
+
+    /**
+     * Toggle category selection
+     */
+    private void toggleCategory(WorkoutCategory category, CardView card) {
+        if (onboardingData.isCategorySelected(category)) {
+            onboardingData.removePreferredCategory(category);
+            card.setCardBackgroundColor(getResources().getColor(R.color.card_background));
+        } else {
+            onboardingData.addPreferredCategory(category);
+            card.setCardBackgroundColor(getResources().getColor(R.color.primary_light));
+        }
+        updateNextButtonState();
+    }
+
+    /**
+     * Helper method to get card view for category
+     */
+    private CardView getCategoryCard(WorkoutCategory category) {
+        switch (category) {
+            case CARDIO: return cardCardio;
+            case STRENGTH: return cardStrength;
+            case FLEXIBILITY: return cardFlexibility;
+            case YOGA: return cardYoga;
+            case HIIT: return cardHiit;
+            case BREATHING: return cardBreathing;
+            default: return null;
+        }
     }
 
     /**
@@ -342,9 +428,10 @@ public class UsernameSetupActivity extends AppCompatActivity {
      */
     private void updateStepVisibility(int currentStep) {
         // Hide all steps
-        stepUsername.setVisibility(View.GONE);
-        stepDifficulty.setVisibility(View.GONE);
-        // Add more steps here as they're implemented
+        stepUsername.setVisibility(View.GONE);      // LinearLayout
+        stepDifficulty.setVisibility(View.GONE);    // ScrollView
+        stepPreferences.setVisibility(View.GONE);   // ScrollView
+        stepCategories.setVisibility(View.GONE);    // ScrollView
 
         // Show current step
         switch (currentStep) {
@@ -356,7 +443,12 @@ public class UsernameSetupActivity extends AppCompatActivity {
             case OnboardingData.STEP_DIFFICULTY:
                 stepDifficulty.setVisibility(View.VISIBLE);
                 break;
-            // Add cases for steps 3 and 4 when implemented
+            case OnboardingData.STEP_PREFERENCES:
+                stepPreferences.setVisibility(View.VISIBLE);
+                break;
+            case OnboardingData.STEP_CATEGORIES:
+                stepCategories.setVisibility(View.VISIBLE);
+                break;
             default:
                 stepUsername.setVisibility(View.VISIBLE);
                 break;
@@ -406,6 +498,12 @@ public class UsernameSetupActivity extends AppCompatActivity {
             case OnboardingData.STEP_DIFFICULTY:
                 errorMessage = "Please select your fitness level";
                 break;
+            case OnboardingData.STEP_PREFERENCES:
+                errorMessage = "Please review your preferences";
+                break;
+            case OnboardingData.STEP_CATEGORIES:
+                errorMessage = "Please select at least one workout type";
+                break;
             default:
                 errorMessage = "Please complete this step";
                 break;
@@ -438,6 +536,7 @@ public class UsernameSetupActivity extends AppCompatActivity {
             }
         });
     }
+
     /**
      * Handle back button press - Legacy approach (for older Android versions)
      * Remove this method if using only the modern approach above
@@ -497,6 +596,22 @@ public class UsernameSetupActivity extends AppCompatActivity {
             }
             if (onboardingData.getSelectedDifficulty() != null) {
                 selectDifficulty(onboardingData.getSelectedDifficulty());
+            }
+
+            // Restore preference states
+            if (switchSoundPreference != null) {
+                switchSoundPreference.setChecked(onboardingData.isSoundPreference());
+            }
+            if (switchNotificationPreference != null) {
+                switchNotificationPreference.setChecked(onboardingData.isNotificationPreference());
+            }
+
+            // Restore category selections
+            for (WorkoutCategory category : onboardingData.getPreferredCategories()) {
+                CardView card = getCategoryCard(category);
+                if (card != null) {
+                    card.setCardBackgroundColor(getResources().getColor(R.color.primary_light));
+                }
             }
         }
     }

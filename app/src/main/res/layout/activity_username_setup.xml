@@ -14,30 +14,30 @@
         android:layout_height="80dp"
         android:src="@drawable/ic_moodfit_logo"
         android:contentDescription="MoodFit logo"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="24dp" />
 
     <!-- Welcome Title -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Welcome to MoodFit!"
-        android:textSize="32sp"
+        android:textSize="28sp"
         android:textColor="@color/text_primary"
         android:textStyle="bold"
         android:fontFamily="@font/barlow_semibold"
         android:gravity="center"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="12dp" />
 
     <!-- Subtitle -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Let's personalize your fitness journey"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="@color/text_secondary"
         android:fontFamily="@font/opensans_regular"
         android:gravity="center"
-        android:layout_marginBottom="48dp" />
+        android:layout_marginBottom="32dp" />
 
     <!-- Progress Indicator -->
     <LinearLayout
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="24dp">
 
         <View
             android:id="@+id/step_indicator_1"
@@ -125,7 +125,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:background="@color/card_background">
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -178,225 +178,693 @@
         </LinearLayout>
 
         <!-- Step 2: Difficulty Selection -->
-        <LinearLayout
+        <ScrollView
             android:id="@+id/step_difficulty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:fillViewport="true">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="What's your fitness level?"
-                android:textSize="24sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:fontFamily="@font/barlow_semibold"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
+                android:orientation="vertical"
+                android:paddingTop="40dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Don't worry, you can change this later"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Difficulty Options -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_beginner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
+                    android:text="What's your fitness level?"
+                    android:textSize="24sp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barlow_semibold"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
 
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_beginner"
-                        android:contentDescription="Beginner level"
-                        android:layout_marginEnd="16dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Don't worry, you can change this later"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp" />
+
+                <!-- Difficulty Options -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_beginner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:background="@color/card_background"
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Beginner"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_beginner"
+                            android:contentDescription="Beginner level"
+                            android:layout_marginEnd="16dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Just starting my fitness journey"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Beginner"
+                                android:textSize="18sp"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/barlow_semibold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Just starting my fitness journey"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:fontFamily="@font/opensans_regular" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/check_beginner"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_check_circle"
+                            android:contentDescription="Selected"
+                            android:visibility="visible" />
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/check_beginner"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="visible" />
+                </androidx.cardview.widget.CardView>
 
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_intermediate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_intermediate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_intermediate"
-                        android:contentDescription="Intermediate level"
-                        android:layout_marginEnd="16dp" />
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:background="@color/card_background"
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Intermediate"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_intermediate"
+                            android:contentDescription="Intermediate level"
+                            android:layout_marginEnd="16dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="I exercise regularly"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Intermediate"
+                                android:textSize="18sp"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/barlow_semibold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="I exercise regularly"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:fontFamily="@font/opensans_regular" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/check_intermediate"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_check_circle"
+                            android:contentDescription="Selected"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/check_intermediate"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="gone" />
+                </androidx.cardview.widget.CardView>
 
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_advanced"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/card_advanced"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_advanced"
-                        android:contentDescription="Advanced level"
-                        android:layout_marginEnd="16dp" />
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:background="@color/card_background"
+                        android:gravity="center_vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Advanced"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_advanced"
+                            android:contentDescription="Advanced level"
+                            android:layout_marginEnd="16dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="I'm a fitness enthusiast"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Advanced"
+                                android:textSize="18sp"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/barlow_semibold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="I'm a fitness enthusiast"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:fontFamily="@font/opensans_regular" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/check_advanced"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_check_circle"
+                            android:contentDescription="Selected"
+                            android:visibility="gone" />
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/check_advanced"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="gone" />
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Step 3: Preferences -->
+        <ScrollView
+            android:id="@+id/step_preferences"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="40dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Set your preferences"
+                    android:textSize="24sp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barlow_semibold"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Customize your experience"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp" />
+
+                <!-- Sound Preference -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:background="@color/card_background"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_sound"
+                            android:contentDescription="Sound icon"
+                            android:layout_marginEnd="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sound Effects"
+                                android:textSize="18sp"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/barlow_semibold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Enable workout completion sounds"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:fontFamily="@font/opensans_regular" />
+
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/switch_sound_preference"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Notification Preference -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="20dp"
+                        android:background="@color/card_background"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@drawable/ic_notifications"
+                            android:contentDescription="Notification icon"
+                            android:layout_marginEnd="16dp" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Daily Reminders"
+                                android:textSize="18sp"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/barlow_semibold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Get reminded to work out daily"
+                                android:textSize="14sp"
+                                android:textColor="@color/text_secondary"
+                                android:fontFamily="@font/opensans_regular" />
+
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/switch_notification_preference"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Step 4: Categories -->
+        <ScrollView
+            android:id="@+id/step_categories"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Choose your interests"
+                    android:textSize="24sp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barlow_semibold"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select workout types you enjoy (choose at least one)"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Categories Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- First Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_cardio"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_cardio"
+                                    android:contentDescription="Cardio"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Cardio"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_strength"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_strength"
+                                    android:contentDescription="Strength"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Strength"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <!-- Second Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_flexibility"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_flexibility"
+                                    android:contentDescription="Flexibility"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Flexibility"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_yoga"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_yoga"
+                                    android:contentDescription="Yoga"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Yoga"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                    <!-- Third Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_hiit"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_hiit"
+                                    android:contentDescription="HIIT"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="HIIT"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/card_breathing"
+                            android:layout_width="0dp"
+                            android:layout_height="70dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="2dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="8dp"
+                                android:background="@color/card_background">
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_breathing"
+                                    android:contentDescription="Breathing"
+                                    android:layout_marginBottom="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Breathing"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_primary"
+                                    android:fontFamily="@font/barlow_semibold" />
+
+                            </LinearLayout>
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
 
     </FrameLayout>
 
@@ -405,7 +873,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="32dp">
+        android:layout_marginTop="24dp">
 
         <Button
             android:id="@+id/btn_skip"
