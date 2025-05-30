@@ -27,9 +27,9 @@
     <color name="button_secondary_pressed">#CBD5E1</color>
 
     <!-- Timer Colors -->
-    <color name="timer_background">#312E81</color>
+    <color name="timer_background">#4F46E5</color>
     <color name="timer_text">#FFFFFF</color>
-    <color name="timer_text_secondary">#A5B4FC</color>
+    <color name="timer_text_secondary">#E0E7FF</color>
 
     <!-- Mood Colors -->
     <color name="mood_happy">#10B981</color>

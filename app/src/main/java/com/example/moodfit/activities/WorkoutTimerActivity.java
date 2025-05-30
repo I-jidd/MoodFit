@@ -22,6 +22,7 @@ import com.example.moodfit.utils.DataManager;
 /**
  * WorkoutTimerActivity - Comprehensive workout timer with customizable durations
  * Integrates with workout sessions and provides audio/visual feedback
+ * FIXED: Duration sync with exercises and proper navigation flow
  */
 public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTimer.TimerListener {
 
@@ -43,6 +44,7 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     // UI Components - Timer Display
     private CardView timerCard;
     private TextView tvTimerDisplay;
+    private TextView tvExerciseNameTimer; // NEW: For showing exercise name
 
     // UI Components - Controls
     private Button btnStart;
@@ -58,10 +60,12 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     private long sessionStartTime;
     private int completedCycles = 0;
 
-    // Intent Data
+    // Intent Data - EXPANDED
     private MoodType workoutMood;
     private String sessionId;
     private int estimatedDuration;
+    private String exerciseName;
+    private boolean isFromExerciseDemo = false;
 
     // Audio
     private MediaPlayer completionSound;
@@ -75,16 +79,16 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         // Initialize data management
         initializeDataManager();
 
-        // Get intent data
-        extractIntentData();
-
-        // Initialize UI components
+        // Initialize UI components FIRST
         initializeViews();
+
+        // Get intent data - UPDATED with exercise sync (now that views exist)
+        extractIntentData();
 
         // Setup event listeners
         setupEventListeners();
 
-        // Initialize timer
+        // Initialize timer - UPDATED to use exercise duration
         initializeTimer();
 
         // Setup audio
@@ -104,7 +108,7 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     }
 
     /**
-     * Extract data passed from previous activity
+     * Extract data passed from previous activity - UPDATED with duration sync
      */
     private void extractIntentData() {
         Intent intent = getIntent();
@@ -122,6 +126,21 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
             // Get session ID and estimated duration
             sessionId = intent.getStringExtra("session_id");
             estimatedDuration = intent.getIntExtra("estimated_duration", 30);
+
+            // NEW: Get exercise-specific data
+            exerciseName = intent.getStringExtra("exercise_name");
+            int exerciseDuration = intent.getIntExtra("exercise_duration", 0);
+            isFromExerciseDemo = intent.getBooleanExtra("single_exercise_mode", false);
+
+            // Use exercise duration if available
+            if (exerciseDuration > 0) {
+                selectedDuration = exerciseDuration * 60; // Convert minutes to seconds
+
+                if (isFromExerciseDemo) {
+                    hideTimerSelection();
+                    showExerciseTimerMode();
+                }
+            }
         }
 
         // Record session start time
@@ -137,8 +156,11 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         btn60Sec = findViewById(R.id.btn_60_sec);
 
         // Timer display
-        timerCard = findViewById(R.id.timer_card); // Assuming the CardView has this ID
+        timerCard = findViewById(R.id.timer_card);
         tvTimerDisplay = findViewById(R.id.tv_timer_display);
+
+        // NEW: Exercise name display (may be null if not in layout)
+        tvExerciseNameTimer = findViewById(R.id.tv_exercise_name_timer);
 
         // Control buttons
         btnStart = findViewById(R.id.btn_start);
@@ -173,7 +195,7 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     }
 
     /**
-     * Initialize the workout timer
+     * Initialize the workout timer - UPDATED to use exercise duration
      */
     private void initializeTimer() {
         workoutTimer = new WorkoutTimer(selectedDuration);
@@ -196,11 +218,73 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     }
 
     /**
-     * Select timer duration and update UI
+     * NEW: Hide timer selection buttons for exercise mode
+     */
+    private void hideTimerSelection() {
+        // Add null checks to prevent crashes
+        if (btn30Sec == null || btn60Sec == null) {
+            android.util.Log.w(TAG, "Timer buttons not initialized yet, skipping hideTimerSelection");
+            return;
+        }
+
+        btn30Sec.setVisibility(View.GONE);
+        btn60Sec.setVisibility(View.GONE);
+
+        // Add text to show this is exercise timer
+        TextView exerciseTimerLabel = new TextView(this);
+        exerciseTimerLabel.setText("Exercise Timer");
+        exerciseTimerLabel.setTextSize(16);
+        exerciseTimerLabel.setTextColor(getResources().getColor(R.color.text_secondary));
+        exerciseTimerLabel.setGravity(android.view.Gravity.CENTER);
+        exerciseTimerLabel.setPadding(16, 8, 16, 8);
+
+        // Add to layout where timer buttons were
+        android.view.ViewGroup parent = (android.view.ViewGroup) btn30Sec.getParent();
+        if (parent instanceof android.widget.LinearLayout) {
+            parent.addView(exerciseTimerLabel, 0);
+        }
+    }
+
+    /**
+     * NEW: Show exercise timer mode with exercise name
+     */
+    private void showExerciseTimerMode() {
+        if (exerciseName != null) {
+            // Use existing TextView if available
+            if (tvExerciseNameTimer != null) {
+                tvExerciseNameTimer.setText(exerciseName);
+                tvExerciseNameTimer.setVisibility(View.VISIBLE);
+            } else {
+                // Create dynamically if not in layout - but only if tvTimerDisplay exists
+                if (tvTimerDisplay == null) {
+                    android.util.Log.w(TAG, "Timer display not initialized yet, skipping exercise name display");
+                    return;
+                }
+
+                TextView exerciseNameView = new TextView(this);
+                exerciseNameView.setTextSize(18);
+                exerciseNameView.setTextColor(getResources().getColor(R.color.text_primary));
+                exerciseNameView.setGravity(android.view.Gravity.CENTER);
+                exerciseNameView.setPadding(16, 8, 16, 8);
+                exerciseNameView.setText(exerciseName);
+                exerciseNameView.setBackground(getResources().getDrawable(R.drawable.secondary_button_background));
+
+                // Add above timer display
+                android.view.ViewGroup parent = (android.view.ViewGroup) tvTimerDisplay.getParent();
+                if (parent instanceof android.widget.LinearLayout) {
+                    int timerIndex = ((android.widget.LinearLayout) parent).indexOfChild(tvTimerDisplay);
+                    parent.addView(exerciseNameView, timerIndex);
+                }
+            }
+        }
+    }
+
+    /**
+     * Select timer duration and update UI - UPDATED for exercise mode
      */
     private void selectTimerDuration(int duration) {
-        if (isTimerRunning) {
-            // Don't allow duration change while timer is running
+        if (isTimerRunning || isFromExerciseDemo) {
+            // Don't allow duration change while timer is running or in exercise mode
             return;
         }
 
@@ -219,9 +303,15 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
     }
 
     /**
-     * Update timer selection button states
+     * Update timer selection button states - UPDATED for exercise mode
      */
     private void updateTimerSelectionButtons() {
+        // If coming from exercise demo, don't show selection buttons
+        if (isFromExerciseDemo) {
+            // Already hidden in hideTimerSelection()
+            return;
+        }
+
         // Reset both buttons
         btn30Sec.setSelected(false);
         btn60Sec.setSelected(false);
@@ -419,11 +509,12 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         btnReset.setEnabled(true);
         btnReset.setAlpha(1.0f);
 
-        // Disable timer selection during active timer
-        btn30Sec.setEnabled(!isTimerRunning);
-        btn60Sec.setEnabled(!isTimerRunning);
-        btn30Sec.setAlpha(isTimerRunning ? 0.5f : 1.0f);
-        btn60Sec.setAlpha(isTimerRunning ? 0.5f : 1.0f);
+        // Disable timer selection during active timer or in exercise mode
+        boolean allowSelection = !isTimerRunning && !isFromExerciseDemo;
+        btn30Sec.setEnabled(allowSelection);
+        btn60Sec.setEnabled(allowSelection);
+        btn30Sec.setAlpha(allowSelection ? 1.0f : 0.5f);
+        btn60Sec.setAlpha(allowSelection ? 1.0f : 0.5f);
     }
 
     /**
@@ -453,7 +544,7 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         timerCard.setScaleY(1.0f);
     }
 
-    // WorkoutTimer.TimerListener implementation
+    // ==================== WorkoutTimer.TimerListener Implementation ====================
 
     @Override
     public void onTick(int remainingSeconds) {
@@ -471,14 +562,14 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
             // Play completion sound
             playCompletionSound();
 
-            // Show completion feedback
-            showCompletionFeedback();
+            // Show completion feedback with options - NEW
+            showTimerCompletionDialog();
 
             // Update UI
             updateControlButtonStates();
             resetTimerCardAppearance();
 
-            // Auto-reset for next cycle
+            // Auto-reset for potential next cycle
             resetTimer();
         });
     }
@@ -499,6 +590,8 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         uiHandler.post(() -> startTimerLoop());
     }
 
+    // ==================== Audio and Haptic Feedback ====================
+
     /**
      * Play completion sound if enabled
      */
@@ -517,29 +610,6 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
 
         // Haptic feedback
         performHapticFeedback();
-    }
-
-    /**
-     * Show completion feedback
-     */
-    private void showCompletionFeedback() {
-        // Celebration animation
-        timerCard.animate()
-                .scaleX(1.2f)
-                .scaleY(1.2f)
-                .setDuration(300)
-                .withEndAction(() -> {
-                    timerCard.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setDuration(300)
-                            .start();
-                })
-                .start();
-
-        // Show completion message
-        String message = "Timer completed! Cycle " + completedCycles + " ✅";
-        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -564,8 +634,40 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         }
     }
 
+    // ==================== NEW: Timer Completion Dialog ====================
+
     /**
-     * Handle back button press
+     * NEW: Show dialog when timer completes with user options
+     */
+    private void showTimerCompletionDialog() {
+        String durationText = selectedDuration >= 60 ?
+                (selectedDuration / 60) + " minute" + (selectedDuration == 60 ? "" : "s") :
+                selectedDuration + " seconds";
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Timer Complete! 🎉")
+                .setMessage("Great job! You completed " + durationText + " of exercise.\n\nWhat would you like to do next?")
+                .setPositiveButton("Exercise Complete", (dialog, which) -> {
+                    // Mark exercise as completed and return
+                    finishWorkout();
+                })
+                .setNeutralButton("Another Round", (dialog, which) -> {
+                    // Reset and allow another timer cycle
+                    dialog.dismiss();
+                    // Timer is already reset, user can start again
+                })
+                .setNegativeButton("Back to Demo", (dialog, which) -> {
+                    // Go back to exercise demo
+                    returnToExerciseDemo();
+                })
+                .setCancelable(false) // Force user to choose
+                .show();
+    }
+
+    // ==================== UPDATED: Navigation Handling ====================
+
+    /**
+     * Handle back button press - IMPROVED
      */
     @Override
     public void onBackPressed() {
@@ -573,27 +675,55 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
             // Show confirmation dialog if timer is running
             showExitConfirmationDialog();
         } else {
-            finishWorkout();
+            // If timer is not running, go back to demo without finishing workout
+            returnToExerciseDemo();
         }
     }
 
     /**
-     * Show confirmation dialog when trying to exit during active timer
+     * Show confirmation dialog when trying to exit during active timer - IMPROVED
      */
     private void showExitConfirmationDialog() {
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Exit Timer?")
-                .setMessage("Your timer is still running. Do you want to stop and exit?")
+                .setTitle("Pause Exercise?")
+                .setMessage("Your timer is still running. What would you like to do?")
                 .setPositiveButton("Continue Timer", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Stop & Exit", (dialog, which) -> {
+                .setNeutralButton("Pause & Go Back", (dialog, which) -> {
+                    pauseResumeTimer(); // Pause the timer
+                    returnToExerciseDemo();
+                })
+                .setNegativeButton("Stop Exercise", (dialog, which) -> {
                     resetTimer();
-                    finishWorkout();
+                    returnToExerciseDemo();
                 })
                 .show();
     }
 
     /**
-     * Finish workout and return to previous activity
+     * NEW: Return to exercise demo screen
+     */
+    private void returnToExerciseDemo() {
+        // Calculate time spent
+        long totalTime = System.currentTimeMillis() - sessionStartTime;
+        int actualDurationMinutes = (int) (totalTime / (1000 * 60));
+
+        // Prepare result intent
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("timer_cancelled", true);
+        resultIntent.putExtra("actual_duration", actualDurationMinutes);
+        resultIntent.putExtra("completed_cycles", completedCycles);
+        resultIntent.putExtra("session_id", sessionId);
+        resultIntent.putExtra("timer_was_running", isTimerRunning);
+
+        // Set result as cancelled since exercise was not completed
+        setResult(RESULT_CANCELED, resultIntent);
+
+        finish();
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    /**
+     * Finish workout and return to previous activity - UPDATED
      */
     private void finishWorkout() {
         // Calculate total workout time
@@ -605,9 +735,10 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         resultIntent.putExtra("actual_duration", actualDurationMinutes);
         resultIntent.putExtra("completed_cycles", completedCycles);
         resultIntent.putExtra("session_id", sessionId);
+        resultIntent.putExtra("timer_completed", true);
 
         if (completedCycles > 0) {
-            // Workout was completed
+            // Workout was completed successfully
             setResult(RESULT_OK, resultIntent);
         } else {
             // Workout was cancelled
@@ -618,29 +749,7 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
-    /**
-     * Clean up resources
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Clean up timer
-        if (workoutTimer != null) {
-            workoutTimer.stop();
-        }
-
-        // Clean up audio
-        if (completionSound != null) {
-            completionSound.release();
-            completionSound = null;
-        }
-
-        // Clean up handler
-        if (uiHandler != null) {
-            uiHandler.removeCallbacksAndMessages(null);
-        }
-    }
+    // ==================== Activity Lifecycle ====================
 
     /**
      * Handle activity pause
@@ -665,5 +774,29 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
 
         // Update display
         updateTimerDisplay();
+    }
+
+    /**
+     * Clean up resources
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Clean up timer
+        if (workoutTimer != null) {
+            workoutTimer.stop();
+        }
+
+        // Clean up audio
+        if (completionSound != null) {
+            completionSound.release();
+            completionSound = null;
+        }
+
+        // Clean up handler
+        if (uiHandler != null) {
+            uiHandler.removeCallbacksAndMessages(null);
+        }
     }
 }

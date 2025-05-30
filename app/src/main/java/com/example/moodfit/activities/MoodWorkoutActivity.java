@@ -620,23 +620,27 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Enable start workout button
+     * Re-enable start workout button (in case it was disabled)
      */
     private void enableStartWorkoutButton() {
-        btnStartWorkout.setEnabled(true);
-        btnStartWorkout.animate()
-                .alpha(1.0f)
-                .scaleX(1.05f)
-                .scaleY(1.05f)
-                .setDuration(200)
-                .withEndAction(() -> {
-                    btnStartWorkout.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setDuration(100)
-                            .start();
-                })
-                .start();
+        if (selectedMood != null && !recommendedExercises.isEmpty()) {
+            btnStartWorkout.setEnabled(true);
+            btnStartWorkout.setAlpha(1.0f);
+
+            // Add subtle animation to draw attention
+            btnStartWorkout.animate()
+                    .scaleX(1.05f)
+                    .scaleY(1.05f)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        btnStartWorkout.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(200)
+                                .start();
+                    })
+                    .start();
+        }
     }
 
     /**
@@ -725,7 +729,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle results from exercise demo and timer activities
+     * Handle results from exercise demo and timer activities - UPDATED
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -748,14 +752,76 @@ public class MoodWorkoutActivity extends AppCompatActivity {
                     finish();
                 }
             } else if (resultCode == RESULT_CANCELED) {
-                // Workout was cancelled, clean up
-                if (currentSession != null) {
-                    currentSession = null;
-                }
-                finish();
+                // User returned from exercise demo (either cancelled exercise or went back)
+                handleExerciseDemoReturn(data);
             }
         }
     }
+
+    /**
+     * Handle return from exercise demo when cancelled
+     */
+    private void handleExerciseDemoReturn(Intent data) {
+        if (data != null) {
+            String action = data.getStringExtra("action");
+
+            if ("exercise_cancelled".equals(action)) {
+                // User cancelled a specific exercise but wants to stay in workout
+                showExerciseCancelledFeedback();
+                // Stay on mood workout screen - user can restart or choose different mood
+
+            } else {
+                // User went back from demo screen
+                showReturnFromDemoFeedback();
+            }
+        } else {
+            // Normal back navigation from demo
+            showReturnFromDemoFeedback();
+        }
+
+        // Re-enable the start workout button in case it was disabled
+        enableStartWorkoutButton();
+    }
+
+    /**
+     * Show feedback when user cancels an exercise
+     */
+    private void showExerciseCancelledFeedback() {
+        android.widget.Toast.makeText(this,
+                "No worries! You can try the exercise again or choose a different mood.",
+                android.widget.Toast.LENGTH_LONG).show();
+
+        // Optional: Add gentle pulse to mood selection to encourage re-selection
+        if (selectedMood != null) {
+            ImageButton selectedButton = getMoodButton(selectedMood);
+            if (selectedButton != null) {
+                selectedButton.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(300)
+                        .withEndAction(() -> {
+                            selectedButton.animate()
+                                    .scaleX(1.15f) // Back to selected state
+                                    .scaleY(1.15f)
+                                    .setDuration(300)
+                                    .start();
+                        })
+                        .start();
+            }
+        }
+    }
+
+    /**
+     * Show feedback when user returns from demo
+     */
+    private void showReturnFromDemoFeedback() {
+        // Gentle feedback that they're back to mood selection
+        android.widget.Toast.makeText(this,
+                "Ready to start your workout?",
+                android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+
 
     /**
      * Navigate to the next exercise in the sequence

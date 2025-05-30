@@ -338,12 +338,117 @@ public class ExerciseDemoActivity extends AppCompatActivity {
         if (requestCode == 2001) { // Timer result
             if (resultCode == RESULT_OK) {
                 // Exercise completed successfully
-                proceedToNextExercise();
+                handleExerciseCompletion(data);
             } else if (resultCode == RESULT_CANCELED) {
-                // Exercise was cancelled - return to previous screen
-                finish();
+                // Exercise was cancelled - STAY on demo screen, don't finish
+                handleExerciseCancellation(data);
             }
         }
+    }
+
+    /**
+     * Handle successful exercise completion
+     */
+    private void handleExerciseCompletion(Intent data) {
+        // Show completion feedback
+        showExerciseCompletionFeedback();
+
+        // Small delay before proceeding to next exercise
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+            proceedToNextExercise();
+        }, 1500);
+    }
+
+    /**
+     * Handle exercise cancellation (back button from timer)
+     */
+    private void handleExerciseCancellation(Intent data) {
+        // Show user-friendly message that they're back to exercise demo
+        showExerciseCancellationFeedback();
+
+        // Re-enable start button in case it was disabled
+        btnStartExercise.setEnabled(true);
+        btnStartExercise.setAlpha(1.0f);
+
+        // Optional: Add visual feedback that exercise was not completed
+        addCancellationVisualFeedback();
+    }
+
+    /**
+     * Show feedback when exercise is completed
+     */
+    private void showExerciseCompletionFeedback() {
+        // Create a temporary success overlay
+        android.widget.TextView successMessage = new android.widget.TextView(this);
+        successMessage.setText("✅ Exercise Completed!");
+        successMessage.setTextSize(18);
+        successMessage.setTextColor(getResources().getColor(R.color.success));
+        successMessage.setGravity(android.view.Gravity.CENTER);
+        successMessage.setBackgroundColor(getResources().getColor(R.color.background_primary));
+        successMessage.setPadding(32, 16, 32, 16);
+
+        // Add to layout temporarily
+        android.view.ViewGroup rootLayout = findViewById(android.R.id.content);
+        rootLayout.addView(successMessage);
+
+        // Animate and remove after delay
+        successMessage.setAlpha(0f);
+        successMessage.animate()
+                .alpha(1f)
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(300)
+                .withEndAction(() -> {
+                    successMessage.animate()
+                            .alpha(0f)
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(300)
+                            .withEndAction(() -> rootLayout.removeView(successMessage))
+                            .start();
+                })
+                .start();
+    }
+
+    /**
+     * Show feedback when exercise is cancelled
+     */
+    private void showExerciseCancellationFeedback() {
+        // Show a gentle message that they can restart
+        android.widget.Toast.makeText(this,
+                "Exercise paused. You can restart when ready!",
+                android.widget.Toast.LENGTH_SHORT).show();
+
+        // Optional: Animate the start button to draw attention
+        btnStartExercise.animate()
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(200)
+                .withEndAction(() -> {
+                    btnStartExercise.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(200)
+                            .start();
+                })
+                .start();
+    }
+
+    /**
+     * Add visual feedback for cancellation
+     */
+    private void addCancellationVisualFeedback() {
+        // Add a subtle visual indicator that exercise was not completed
+        exerciseInfoCard.animate()
+                .alpha(0.8f)
+                .setDuration(200)
+                .withEndAction(() -> {
+                    exerciseInfoCard.animate()
+                            .alpha(1.0f)
+                            .setDuration(200)
+                            .start();
+                })
+                .start();
     }
 
     /**
@@ -364,17 +469,21 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle back button press
+     * Update the back button behavior to show confirmation
      */
     @Override
     public void onBackPressed() {
-        // Show confirmation dialog
+        // Show confirmation dialog with better context
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Exit Workout?")
-                .setMessage("Are you sure you want to exit your workout? Your progress will be lost.")
-                .setPositiveButton("Continue Workout", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Exit", (dialog, which) -> {
-                    setResult(RESULT_CANCELED);
+                .setTitle("Leave Exercise?")
+                .setMessage("Are you sure you want to go back? You can restart this exercise anytime.")
+                .setPositiveButton("Stay Here", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("Go Back", (dialog, which) -> {
+                    // Return to MoodWorkoutActivity instead of finishing completely
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("action", "exercise_cancelled");
+                    resultIntent.putExtra("current_exercise_index", currentExerciseIndex);
+                    setResult(RESULT_CANCELED, resultIntent);
                     finish();
                     overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
                 })
