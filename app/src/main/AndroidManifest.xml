@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -29,6 +30,16 @@
         </activity>
         <activity
             android:name=".activities.HomeActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name=".activities.MoodWorkoutActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name=".activities.WorkoutTimerActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
         </activity>

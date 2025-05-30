@@ -19,7 +19,7 @@
         android:layout_marginBottom="32dp"
         android:fontFamily="@font/barlow_semibold" />
 
-    <!-- Mood Selection Horizontal Bar -->
+    <!-- Mood Selection with Labels -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,49 +27,133 @@
         android:gravity="center"
         android:layout_marginBottom="40dp">
 
-        <ImageButton
-            android:id="@+id/btn_mood_happy"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/mood_button_selector"
-            android:src="@drawable/ic_mood_happy"
-            android:contentDescription="Happy mood"
-            android:clickable="true"
-            android:focusable="true" />
+        <!-- Happy Mood -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="4dp">
 
-        <ImageButton
-            android:id="@+id/btn_mood_neutral"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/mood_button_selector"
-            android:src="@drawable/ic_mood_neutral"
-            android:contentDescription="Neutral mood"
-            android:clickable="true"
-            android:focusable="true" />
+            <ImageButton
+                android:id="@+id/btn_mood_happy"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/mood_button_selector"
+                android:src="@drawable/ic_mood_happy"
+                android:contentDescription="Happy mood"
+                android:clickable="true"
+                android:focusable="true" />
 
-        <ImageButton
-            android:id="@+id/btn_mood_frustrated"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/mood_button_selector"
-            android:src="@drawable/ic_mood_frustrated"
-            android:contentDescription="Frustrated mood"
-            android:clickable="true"
-            android:focusable="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Happy"
+                android:textSize="12sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:fontFamily="@font/barlow_semibold" />
 
-        <ImageButton
-            android:id="@+id/btn_mood_stressed"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/mood_button_selector"
-            android:src="@drawable/ic_mood_stressed"
-            android:contentDescription="Stressed mood"
-            android:clickable="true"
-            android:focusable="true" />
+        </LinearLayout>
+
+        <!-- Neutral Mood -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="4dp">
+
+            <ImageButton
+                android:id="@+id/btn_mood_neutral"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/mood_button_selector"
+                android:src="@drawable/ic_mood_neutral"
+                android:contentDescription="Neutral mood"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Neutral"
+                android:textSize="12sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:fontFamily="@font/barlow_semibold" />
+
+        </LinearLayout>
+
+        <!-- Frustrated Mood -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="4dp">
+
+            <ImageButton
+                android:id="@+id/btn_mood_frustrated"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/mood_button_selector"
+                android:src="@drawable/ic_mood_frustrated"
+                android:contentDescription="Frustrated mood"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Frustrated"
+                android:textSize="12sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:fontFamily="@font/barlow_semibold" />
+
+        </LinearLayout>
+
+        <!-- Stressed Mood -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_margin="4dp">
+
+            <ImageButton
+                android:id="@+id/btn_mood_stressed"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/mood_button_selector"
+                android:src="@drawable/ic_mood_stressed"
+                android:contentDescription="Stressed mood"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stressed"
+                android:textSize="12sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:fontFamily="@font/barlow_semibold" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
