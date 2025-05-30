@@ -660,13 +660,25 @@ public class MoodWorkoutActivity extends AppCompatActivity {
             // Start the session
             currentSession.startWorkout();
 
-            // Navigate to workout timer with session data
-            Intent timerIntent = new Intent(this, WorkoutTimerActivity.class);
-            timerIntent.putExtra("mood_type", selectedMood.name());
-            timerIntent.putExtra("session_id", currentSession.getSessionId());
-            timerIntent.putExtra("estimated_duration", getEstimatedTotalDuration());
+            // Navigate to exercise demo/tutorial for the first exercise
+            Intent demoIntent = new Intent(this, ExerciseDemoActivity.class);
+            demoIntent.putExtra("mood_type", selectedMood.name());
+            demoIntent.putExtra("session_id", currentSession.getSessionId());
+            demoIntent.putExtra("current_exercise_index", 0);
+            demoIntent.putExtra("total_exercises", recommendedExercises.size());
+            demoIntent.putExtra("estimated_duration", getEstimatedTotalDuration());
 
-            startActivityForResult(timerIntent, 1001);
+            // Pass current exercise data
+            Exercise firstExercise = recommendedExercises.get(0);
+            demoIntent.putExtra("exercise_name", firstExercise.getName());
+            demoIntent.putExtra("exercise_description", firstExercise.getDescription());
+            demoIntent.putExtra("exercise_instructions", firstExercise.getInstructions());
+            demoIntent.putExtra("exercise_duration", firstExercise.getEstimatedDurationMinutes());
+            demoIntent.putExtra("exercise_calories", firstExercise.getEstimatedCalories());
+            demoIntent.putExtra("exercise_category", firstExercise.getCategory().getDisplayName());
+            demoIntent.putExtra("exercise_difficulty", firstExercise.getDifficulty().getDisplayName());
+
+            startActivityForResult(demoIntent, 1001);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 
         } catch (Exception e) {
@@ -713,25 +725,73 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle results from workout timer activity
+     * Handle results from exercise demo and timer activities
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1001) { // Workout timer result
-            if (resultCode == RESULT_OK && currentSession != null) {
-                // Workout completed successfully
-                completeWorkoutSession(data);
-                setResult(RESULT_OK); // Notify HomeActivity to refresh
-                finish();
+        if (requestCode == 1001) { // Exercise demo result
+            if (resultCode == RESULT_OK && data != null) {
+                String action = data.getStringExtra("action");
+
+                if ("next_exercise".equals(action)) {
+                    // Move to next exercise
+                    int nextExerciseIndex = data.getIntExtra("current_exercise_index", 0);
+                    navigateToNextExercise(nextExerciseIndex);
+
+                } else if ("workout_complete".equals(action)) {
+                    // All exercises completed
+                    completeWorkoutSession(data);
+                    setResult(RESULT_OK); // Notify HomeActivity to refresh
+                    showCompletionMessage();
+                    finish();
+                }
             } else if (resultCode == RESULT_CANCELED) {
                 // Workout was cancelled, clean up
                 if (currentSession != null) {
                     currentSession = null;
                 }
+                finish();
             }
         }
+    }
+
+    /**
+     * Navigate to the next exercise in the sequence
+     */
+    private void navigateToNextExercise(int exerciseIndex) {
+        if (exerciseIndex >= recommendedExercises.size()) {
+            // All exercises completed
+            completeWorkoutSession(null);
+            setResult(RESULT_OK);
+            showCompletionMessage();
+            finish();
+            return;
+        }
+
+        // Get the next exercise
+        Exercise nextExercise = recommendedExercises.get(exerciseIndex);
+
+        // Navigate to exercise demo for next exercise
+        Intent demoIntent = new Intent(this, ExerciseDemoActivity.class);
+        demoIntent.putExtra("mood_type", selectedMood.name());
+        demoIntent.putExtra("session_id", currentSession.getSessionId());
+        demoIntent.putExtra("current_exercise_index", exerciseIndex);
+        demoIntent.putExtra("total_exercises", recommendedExercises.size());
+        demoIntent.putExtra("estimated_duration", getEstimatedTotalDuration());
+
+        // Pass exercise data
+        demoIntent.putExtra("exercise_name", nextExercise.getName());
+        demoIntent.putExtra("exercise_description", nextExercise.getDescription());
+        demoIntent.putExtra("exercise_instructions", nextExercise.getInstructions());
+        demoIntent.putExtra("exercise_duration", nextExercise.getEstimatedDurationMinutes());
+        demoIntent.putExtra("exercise_calories", nextExercise.getEstimatedCalories());
+        demoIntent.putExtra("exercise_category", nextExercise.getCategory().getDisplayName());
+        demoIntent.putExtra("exercise_difficulty", nextExercise.getDifficulty().getDisplayName());
+
+        startActivityForResult(demoIntent, 1001);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     /**

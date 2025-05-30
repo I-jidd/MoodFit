@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Happy celebration with sparkles and stars -->
+
+    <!-- Large center star -->
+    <path
+        android:fillColor="@color/mood_happy"
+        android:pathData="M12,2l2.4,7.2L22,12l-7.6,2.8L12,22l-2.4,-7.2L2,12l7.6,-2.8L12,2z"/>
+
+    <!-- Small sparkle top-left -->
+    <path
+        android:fillColor="@color/accent_color"
+        android:pathData="M6,4l1,2l2,1l-2,1l-1,2l-1,-2l-2,-1l2,-1l1,-2z"/>
+
+    <!-- Small sparkle top-right -->
+    <path
+        android:fillColor="@color/accent_color"
+        android:pathData="M18,6l0.8,1.6l1.6,0.8l-1.6,0.8L18,10.4l-0.8,-1.6L15.6,8l1.6,-0.8L18,6z"/>
+
+    <!-- Small sparkle bottom-left -->
+    <path
+        android:fillColor="@color/accent_color"
+        android:pathData="M4,16l0.6,1.2l1.2,0.6l-1.2,0.6L4,19.6l-0.6,-1.2L2.2,18l1.2,-0.6L4,16z"/>
+
+    <!-- Small sparkle bottom-right -->
+    <path
+        android:fillColor="@color/accent_color"
+        android:pathData="M20,16l0.8,1.6l1.6,0.8l-1.6,0.8L20,20.4l-0.8,-1.6L17.6,18l1.6,-0.8L20,16z"/>
+
+    <!-- Confetti pieces -->
+    <path
+        android:fillColor="@color/primary_light"
+        android:pathData="M8,1h1v2h-1z"/>
+    <path
+        android:fillColor="@color/primary_light"
+        android:pathData="M15,21h1v2h-1z"/>
+    <path
+        android:fillColor="@color/success"
+        android:pathData="M21,8h2v1h-2z"/>
+    <path
+        android:fillColor="@color/success"
+        android:pathData="M1,15h2v1h-2z"/>
+
+</vector>

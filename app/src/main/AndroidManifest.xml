@@ -50,6 +50,21 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
         </activity>
+        <activity
+            android:name=".activities.ExerciseDemoActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name=".activities.WorkoutCompleteActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity
+            android:name=".activities.ProgressStreakActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
 
     </application>
 

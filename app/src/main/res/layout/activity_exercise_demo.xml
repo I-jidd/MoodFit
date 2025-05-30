@@ -1,903 +1,244 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_primary"
-    android:padding="32dp"
-    android:gravity="center">
+    android:fillViewport="true">
 
-    <!-- Logo Section -->
-    <ImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:src="@drawable/ic_moodfit_logo"
-        android:contentDescription="MoodFit logo"
-        android:layout_marginBottom="32dp" />
-
-    <!-- Welcome Title -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Welcome to MoodFit!"
-        android:textSize="32sp"
-        android:textColor="@color/text_primary"
-        android:textStyle="bold"
-        android:fontFamily="@font/barlow_semibold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Subtitle -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Let's personalize your fitness journey"
-        android:textSize="18sp"
-        android:textColor="@color/text_secondary"
-        android:fontFamily="@font/opensans_regular"
-        android:gravity="center"
-        android:layout_marginBottom="48dp" />
-
-    <!-- Progress Indicator -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="32dp">
+        android:orientation="vertical"
+        android:padding="24dp">
+<!--        android:minHeight="match_parent">-->
 
-        <View
-            android:id="@+id/step_indicator_1"
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:background="@color/primary_color"
-            android:layout_marginEnd="8dp" />
+        <!-- Progress Indicator -->
+        <TextView
+            android:id="@+id/tv_progress_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Exercise 1 of 3"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:fontFamily="@font/opensans_regular"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp" />
 
-        <View
-            android:id="@+id/step_indicator_2"
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:background="@color/text_tertiary"
-            android:layout_marginEnd="8dp" />
+        <!-- Exercise Icon -->
+        <ImageView
+            android:id="@+id/iv_exercise_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_fitness_splash"
+            android:contentDescription="Exercise icon"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp" />
 
-        <View
-            android:id="@+id/step_indicator_3"
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:background="@color/text_tertiary"
-            android:layout_marginEnd="8dp" />
-
-        <View
-            android:id="@+id/step_indicator_4"
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:background="@color/text_tertiary" />
-
-    </LinearLayout>
-
-    <!-- Step Content Container -->
-    <FrameLayout
-        android:id="@+id/step_content_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <!-- Step 1: Username Input -->
-        <LinearLayout
-            android:id="@+id/step_username"
+        <!-- Exercise Name -->
+        <TextView
+            android:id="@+id/tv_exercise_name"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+            android:layout_height="wrap_content"
+            android:text="Exercise Name"
+            android:textSize="28sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            android:fontFamily="@font/barlow_semibold"
             android:gravity="center"
-            android:visibility="visible">
+            android:layout_marginBottom="16dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="What should we call you?"
-                android:textSize="24sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:fontFamily="@font/barlow_semibold"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Enter a name that motivates you!"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Username Input Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:background="@color/card_background">
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Your name"
-                        app:boxBackgroundMode="none"
-                        app:hintTextColor="@color/text_secondary">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/et_username"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/opensans_regular"
-                            android:maxLength="20"
-                            android:singleLine="true"
-                            android:inputType="textPersonName|textCapWords" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- Character Counter -->
-                    <TextView
-                        android:id="@+id/tv_character_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0/20"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_secondary"
-                        android:fontFamily="@font/opensans_regular"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="8dp" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Example Names -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Examples: Alex, Champion, Warrior, Sam"
-                android:textSize="14sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:alpha="0.7" />
-
-        </LinearLayout>
-
-        <!-- Step 2: Difficulty Selection -->
-        <LinearLayout
-            android:id="@+id/step_difficulty"
+        <!-- Exercise Info Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/exercise_info_card"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="What's your fitness level?"
-                android:textSize="24sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:fontFamily="@font/barlow_semibold"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Don't worry, you can change this later"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Difficulty Options -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_beginner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_beginner"
-                        android:contentDescription="Beginner level"
-                        android:layout_marginEnd="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Beginner"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Just starting my fitness journey"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/check_beginner"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="visible" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_intermediate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_intermediate"
-                        android:contentDescription="Intermediate level"
-                        android:layout_marginEnd="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Intermediate"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="I exercise regularly"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/check_intermediate"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_advanced"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_advanced"
-                        android:contentDescription="Advanced level"
-                        android:layout_marginEnd="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Advanced"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="I'm a fitness enthusiast"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
-
-                    </LinearLayout>
-
-                    <ImageView
-                        android:id="@+id/check_advanced"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_check_circle"
-                        android:contentDescription="Selected"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-        <!-- Step 3: Preferences -->
-        <LinearLayout
-            android:id="@+id/step_preferences"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Set your preferences"
-                android:textSize="24sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:fontFamily="@font/barlow_semibold"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Customize your experience"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Sound Preference -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_sound"
-                        android:contentDescription="Sound icon"
-                        android:layout_marginEnd="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Sound Effects"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Enable workout completion sounds"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
-
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switch_sound_preference"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Notification Preference -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="20dp"
-                    android:background="@color/card_background"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_notifications"
-                        android:contentDescription="Notification icon"
-                        android:layout_marginEnd="16dp" />
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Daily Reminders"
-                            android:textSize="18sp"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:fontFamily="@font/barlow_semibold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Get reminded to work out daily"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/opensans_regular" />
-
-                    </LinearLayout>
-
-                    <Switch
-                        android:id="@+id/switch_notification_preference"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-        </LinearLayout>
-
-        <!-- Step 4: Categories -->
-        <LinearLayout
-            android:id="@+id/step_categories"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Choose your interests"
-                android:textSize="24sp"
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:fontFamily="@font/barlow_semibold"
-                android:gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Select workout types you enjoy (choose at least one)"
-                android:textSize="16sp"
-                android:textColor="@color/text_secondary"
-                android:fontFamily="@font/opensans_regular"
-                android:gravity="center"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Categories Grid -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@color/card_background">
 
-                <!-- First Row -->
+                <!-- Exercise Description -->
+                <TextView
+                    android:id="@+id/tv_exercise_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Exercise description"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:lineSpacingMultiplier="1.3"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Exercise Stats Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="20dp">
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_cardio"
+                    <!-- Duration -->
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="80dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Duration"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="@font/opensans_regular" />
 
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_cardio"
-                                android:contentDescription="Cardio"
-                                android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/tv_exercise_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10 min"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/barlow_semibold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Cardio"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
+                    </LinearLayout>
 
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_strength"
+                    <!-- Calories -->
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="80dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calories"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="@font/opensans_regular" />
 
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_strength"
-                                android:contentDescription="Strength"
-                                android:layout_marginBottom="4dp" />
+                        <TextView
+                            android:id="@+id/tv_exercise_calories"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="~80 cal"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/barlow_semibold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Strength"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
+                    </LinearLayout>
 
-                        </LinearLayout>
+                    <!-- Category -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    </androidx.cardview.widget.CardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Category"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            android:fontFamily="@font/opensans_regular" />
+
+                        <TextView
+                            android:id="@+id/tv_exercise_category"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cardio"
+                            android:textSize="16sp"
+                            android:textColor="@color/text_primary"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/barlow_semibold" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <!-- Second Row -->
-                <LinearLayout
+                <!-- Instructions Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Instructions"
+                    android:textSize="18sp"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barlow_semibold"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Exercise Instructions -->
+                <TextView
+                    android:id="@+id/tv_exercise_instructions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_flexibility"
-                        android:layout_width="0dp"
-                        android:layout_height="80dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_flexibility"
-                                android:contentDescription="Flexibility"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Flexibility"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_yoga"
-                        android:layout_width="0dp"
-                        android:layout_height="80dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_yoga"
-                                android:contentDescription="Yoga"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Yoga"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- Third Row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_hiit"
-                        android:layout_width="0dp"
-                        android:layout_height="80dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_hiit"
-                                android:contentDescription="HIIT"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="HIIT"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/card_breathing"
-                        android:layout_width="0dp"
-                        android:layout_height="80dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="6dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="2dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:foreground="?android:attr/selectableItemBackground">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:background="@color/card_background">
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/ic_breathing"
-                                android:contentDescription="Breathing"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Breathing"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_primary"
-                                android:fontFamily="@font/barlow_semibold" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
+                    android:text="Exercise instructions will be displayed here"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:lineSpacingMultiplier="1.4" />
 
             </LinearLayout>
 
+        </androidx.cardview.widget.CardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+<!--            android:layout_marginTop="auto">-->
+
+            <!-- Start Exercise Button -->
+            <Button
+                android:id="@+id/btn_start_exercise"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Start Exercise"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/primary_button_background"
+                android:elevation="4dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/barlow_semibold" />
+
+            <!-- Skip Exercise Button -->
+            <Button
+                android:id="@+id/btn_skip_exercise"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Skip This Exercise"
+                android:textSize="16sp"
+                android:textColor="@color/text_secondary"
+                android:background="@drawable/secondary_button_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/barlow_semibold"
+                android:visibility="visible" />
+
         </LinearLayout>
 
-    </FrameLayout>
-
-    <!-- Navigation Buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="32dp">
-
-        <Button
-            android:id="@+id/btn_skip"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:text="Skip"
-            android:textSize="16sp"
-            android:textColor="@color/text_secondary"
-            android:background="@drawable/secondary_button_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/barlow_semibold"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btn_back"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:text="Back"
-            android:textSize="16sp"
-            android:textColor="@color/text_secondary"
-            android:background="@drawable/secondary_button_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/barlow_semibold"
-            android:visibility="gone" />
-
-        <Button
-            android:id="@+id/btn_next"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="2"
-            android:text="Next"
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            android:background="@drawable/primary_button_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/barlow_semibold"
-            android:enabled="false" />
+        <!-- Bottom padding for better spacing -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
 
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
+
+        <!-- Top Spacer -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Celebration Icon -->
+        <ImageView
+            android:id="@+id/iv_celebration_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_celebration_trophy"
+            android:contentDescription="Celebration icon"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Congratulations Title -->
+        <TextView
+            android:id="@+id/tv_congratulations_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Workout Complete! 🎉"
+            android:textSize="32sp"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            android:fontFamily="@font/barlow_semibold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Workout Summary Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/summary_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@color/card_background">
+
+                <!-- Workout Summary -->
+                <TextView
+                    android:id="@+id/tv_workout_summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="You completed a happy mood workout!\n\n✅ 3 exercises completed\n⏱️ ~25 minutes of activity\n😊 Boosted your positive energy!"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:lineSpacingMultiplier="1.4"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Streak Update -->
+                <TextView
+                    android:id="@+id/tv_streak_update"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔥 Amazing! 5 day streak going strong!"
+                    android:textSize="18sp"
+                    android:textColor="@color/accent_color"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/barlow_semibold"
+                    android:gravity="center"
+                    android:background="@drawable/streak_highlight_background"
+                    android:padding="12dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Motivational Message -->
+                <TextView
+                    android:id="@+id/tv_motivational_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Every workout counts towards a healthier you!"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="@font/opensans_regular"
+                    android:gravity="center"
+                    android:textStyle="italic"
+                    android:lineSpacingMultiplier="1.3" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="16dp">
+
+            <!-- Back to Home Button -->
+            <Button
+                android:id="@+id/btn_back_to_home"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Back to Home"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/primary_button_background"
+                android:elevation="4dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/barlow_semibold" />
+
+            <!-- Share Achievement Button -->
+            <Button
+                android:id="@+id/btn_share_achievement"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Share Achievement"
+                android:textSize="16sp"
+                android:textColor="@color/primary_color"
+                android:background="@drawable/secondary_button_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/barlow_semibold"
+                android:drawableStart="@drawable/ic_share"
+                android:drawablePadding="8dp" />
+
+        </LinearLayout>
+
+        <!-- Bottom Spacer -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Bottom padding -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+    </LinearLayout>
+
+</ScrollView>
