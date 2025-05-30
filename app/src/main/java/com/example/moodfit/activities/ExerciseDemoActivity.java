@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * ExerciseDemoActivity - Tutorial and preview screen for individual exercises
  * Shows exercise instructions, tips, and preparation before starting the timer
+ * UPDATED: Now includes GIF loading functionality
  */
 public class ExerciseDemoActivity extends AppCompatActivity {
 
@@ -39,6 +40,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     private TextView tvExerciseCategory;
     private TextView tvProgressIndicator;
     private ImageView ivExerciseIcon;
+    private ImageView ivExerciseGifDemo; // NEW: For GIF display
     private Button btnStartExercise;
     private Button btnSkipExercise;
     private CardView exerciseInfoCard;
@@ -58,6 +60,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     private int exerciseCalories;
     private String exerciseCategory;
     private String exerciseDifficulty;
+    private String exerciseGifName; // NEW: GIF filename
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +94,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Extract data from intent
+     * Extract data from intent - UPDATED to include GIF name
      */
     private void extractIntentData() {
         Intent intent = getIntent();
@@ -120,11 +123,14 @@ public class ExerciseDemoActivity extends AppCompatActivity {
             exerciseCalories = intent.getIntExtra("exercise_calories", 50);
             exerciseCategory = intent.getStringExtra("exercise_category");
             exerciseDifficulty = intent.getStringExtra("exercise_difficulty");
+
+            // NEW: Get GIF name
+            exerciseGifName = intent.getStringExtra("exercise_gif");
         }
     }
 
     /**
-     * Initialize all UI components
+     * Initialize all UI components - UPDATED to include GIF view
      */
     private void initializeViews() {
         // Exercise information
@@ -138,6 +144,9 @@ public class ExerciseDemoActivity extends AppCompatActivity {
 
         // Exercise icon/image
         ivExerciseIcon = findViewById(R.id.iv_exercise_icon);
+
+        // NEW: Exercise GIF view
+        ivExerciseGifDemo = findViewById(R.id.iv_exercise_gif_demo);
 
         // Buttons
         btnStartExercise = findViewById(R.id.btn_start_exercise);
@@ -156,7 +165,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Display exercise information in the UI
+     * Display exercise information in the UI - UPDATED to include GIF loading
      */
     private void displayExerciseInfo() {
         // Set exercise details
@@ -171,6 +180,9 @@ public class ExerciseDemoActivity extends AppCompatActivity {
 
         // Set exercise icon based on category
         setExerciseIcon();
+
+        // NEW: Load exercise GIF
+        loadExerciseGif();
 
         // Add entrance animation
         animateExerciseInfo();
@@ -211,6 +223,78 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
+     * NEW: Load exercise GIF or show placeholder
+     */
+    private void loadExerciseGif() {
+        if (ivExerciseGifDemo == null) {
+            android.util.Log.w(TAG, "GIF ImageView not found");
+            return;
+        }
+
+        // Generate GIF name if not provided
+        if (exerciseGifName == null && exerciseName != null) {
+            exerciseGifName = generateGifName(exerciseName);
+        }
+
+        // DEBUG: Log what we're looking for
+        android.util.Log.d("GIF_DEBUG", "Exercise: " + exerciseName);
+        android.util.Log.d("GIF_DEBUG", "Looking for GIF: " + exerciseGifName);
+
+        if (exerciseGifName != null && !exerciseGifName.isEmpty()) {
+            // Try to load GIF from drawable resources
+            int gifResourceId = getResources().getIdentifier(exerciseGifName, "drawable", getPackageName());
+
+            // DEBUG: Log if resource was found
+            android.util.Log.d("GIF_DEBUG", "Resource ID: " + gifResourceId + " (0 means not found)");
+
+            if (gifResourceId != 0) {
+                // GIF exists, load it
+                ivExerciseGifDemo.setImageResource(gifResourceId);
+                ivExerciseGifDemo.setVisibility(View.VISIBLE);
+
+                // Hide the fallback icon since we have a GIF
+                ivExerciseIcon.setVisibility(View.GONE);
+
+                android.util.Log.d("GIF_DEBUG", "✅ GIF loaded successfully!");
+            } else {
+                // GIF doesn't exist yet, show placeholder and icon
+                android.util.Log.d("GIF_DEBUG", "❌ GIF not found, showing placeholder");
+                showGifPlaceholder();
+            }
+        } else {
+            // No GIF name, show placeholder
+            android.util.Log.d("GIF_DEBUG", "❌ No GIF name provided");
+            showGifPlaceholder();
+        }
+    }
+
+    /**
+     * NEW: Generate GIF filename from exercise name
+     */
+    private String generateGifName(String exerciseName) {
+        if (exerciseName == null) return null;
+
+        // Convert exercise name to lowercase and replace spaces with underscores
+        return "gif_" + exerciseName.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "") // Remove special characters
+                .replaceAll("\\s+", "_") // Replace spaces with underscores
+                .replaceAll("_+", "_"); // Replace multiple underscores with single
+    }
+
+    /**
+     * NEW: Show placeholder when GIF is not available
+     */
+    private void showGifPlaceholder() {
+        // Show default exercise placeholder in the GIF view
+        ivExerciseGifDemo.setImageResource(R.drawable.default_exercise_demo);
+        ivExerciseGifDemo.setVisibility(View.VISIBLE);
+        ivExerciseGifDemo.setAlpha(0.7f);
+
+        // Keep the icon visible as well
+        ivExerciseIcon.setVisibility(View.VISIBLE);
+    }
+
+    /**
      * Animate exercise information appearance
      */
     private void animateExerciseInfo() {
@@ -234,6 +318,20 @@ public class ExerciseDemoActivity extends AppCompatActivity {
                 .setDuration(600)
                 .setStartDelay(200)
                 .start();
+
+        // NEW: Animate the GIF view too
+        if (ivExerciseGifDemo.getVisibility() == View.VISIBLE) {
+            ivExerciseGifDemo.setAlpha(0f);
+            ivExerciseGifDemo.setScaleX(0.8f);
+            ivExerciseGifDemo.setScaleY(0.8f);
+            ivExerciseGifDemo.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(600)
+                    .setStartDelay(200)
+                    .start();
+        }
 
         // Animate buttons
         btnStartExercise.setAlpha(0f);

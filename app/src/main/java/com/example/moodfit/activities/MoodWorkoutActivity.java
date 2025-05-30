@@ -26,6 +26,7 @@ import java.util.Random;
 /**
  * MoodWorkoutActivity - Personalized workout generator based on user's current mood
  * Provides mood-specific exercise recommendations and creates workout sessions
+ * UPDATED: Now includes GIF name generation and passing
  */
 public class MoodWorkoutActivity extends AppCompatActivity {
 
@@ -405,7 +406,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Generate exercises for happy mood - high energy, fun activities
+     * Generate exercises for happy mood - high energy, fun activities - UPDATED with GIF names
      */
     private List<Exercise> generateHappyMoodExercises(DifficultyLevel difficulty) {
         List<Exercise> exercises = new ArrayList<>();
@@ -416,6 +417,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         cardioExercise.setEstimatedDurationMinutes(15);
         cardioExercise.setEstimatedCalories(120);
         cardioExercise.addSuitableMood(MoodType.HAPPY);
+        cardioExercise.setImageUrl(generateGifName("Dance Cardio")); // NEW: Set GIF name
         exercises.add(cardioExercise);
 
         Exercise hiitExercise = new Exercise("Joy HIIT Circuit",
@@ -424,13 +426,14 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         hiitExercise.setEstimatedDurationMinutes(20);
         hiitExercise.setEstimatedCalories(180);
         hiitExercise.addSuitableMood(MoodType.HAPPY);
+        hiitExercise.setImageUrl(generateGifName("Joy HIIT Circuit")); // NEW: Set GIF name
         exercises.add(hiitExercise);
 
         return exercises;
     }
 
     /**
-     * Generate exercises for neutral mood - balanced, general fitness
+     * Generate exercises for neutral mood - balanced, general fitness - UPDATED with GIF names
      */
     private List<Exercise> generateNeutralMoodExercises(DifficultyLevel difficulty) {
         List<Exercise> exercises = new ArrayList<>();
@@ -441,6 +444,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         balancedWorkout.setEstimatedDurationMinutes(25);
         balancedWorkout.setEstimatedCalories(150);
         balancedWorkout.addSuitableMood(MoodType.NEUTRAL);
+        balancedWorkout.setImageUrl(generateGifName("Balanced Body Workout")); // NEW: Set GIF name
         exercises.add(balancedWorkout);
 
         Exercise flexibilityWorkout = new Exercise("Gentle Flexibility Flow",
@@ -449,13 +453,14 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         flexibilityWorkout.setEstimatedDurationMinutes(18);
         flexibilityWorkout.setEstimatedCalories(80);
         flexibilityWorkout.addSuitableMood(MoodType.NEUTRAL);
+        flexibilityWorkout.setImageUrl(generateGifName("Gentle Flexibility Flow")); // NEW: Set GIF name
         exercises.add(flexibilityWorkout);
 
         return exercises;
     }
 
     /**
-     * Generate exercises for frustrated mood - intense, energy-releasing activities
+     * Generate exercises for frustrated mood - intense, energy-releasing activities - UPDATED with GIF names
      */
     private List<Exercise> generateFrustratedMoodExercises(DifficultyLevel difficulty) {
         List<Exercise> exercises = new ArrayList<>();
@@ -466,6 +471,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         strengthTraining.setEstimatedDurationMinutes(30);
         strengthTraining.setEstimatedCalories(200);
         strengthTraining.addSuitableMood(MoodType.FRUSTRATED);
+        strengthTraining.setImageUrl(generateGifName("Power Strength Training")); // NEW: Set GIF name
         exercises.add(strengthTraining);
 
         Exercise intensiveHiit = new Exercise("Frustration-Busting HIIT",
@@ -474,13 +480,14 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         intensiveHiit.setEstimatedDurationMinutes(25);
         intensiveHiit.setEstimatedCalories(220);
         intensiveHiit.addSuitableMood(MoodType.FRUSTRATED);
+        intensiveHiit.setImageUrl(generateGifName("Frustration-Busting HIIT")); // NEW: Set GIF name
         exercises.add(intensiveHiit);
 
         return exercises;
     }
 
     /**
-     * Generate exercises for stressed mood - calming, restorative activities
+     * Generate exercises for stressed mood - calming, restorative activities - UPDATED with GIF names
      */
     private List<Exercise> generateStressedMoodExercises(DifficultyLevel difficulty) {
         List<Exercise> exercises = new ArrayList<>();
@@ -491,6 +498,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         yogaFlow.setEstimatedDurationMinutes(22);
         yogaFlow.setEstimatedCalories(90);
         yogaFlow.addSuitableMood(MoodType.STRESSED);
+        yogaFlow.setImageUrl(generateGifName("Stress-Relief Yoga")); // NEW: Set GIF name
         exercises.add(yogaFlow);
 
         Exercise breathingExercise = new Exercise("Mindful Breathing",
@@ -499,9 +507,23 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         breathingExercise.setEstimatedDurationMinutes(12);
         breathingExercise.setEstimatedCalories(40);
         breathingExercise.addSuitableMood(MoodType.STRESSED);
+        breathingExercise.setImageUrl(generateGifName("Mindful Breathing")); // NEW: Set GIF name
         exercises.add(breathingExercise);
 
         return exercises;
+    }
+
+    /**
+     * NEW: Generate GIF filename from exercise name
+     */
+    private String generateGifName(String exerciseName) {
+        if (exerciseName == null) return null;
+
+        // Convert exercise name to lowercase and replace spaces with underscores
+        return "gif_" + exerciseName.toLowerCase()
+                .replaceAll("[^a-z0-9\\s]", "") // Remove special characters
+                .replaceAll("\\s+", "_") // Replace spaces with underscores
+                .replaceAll("_+", "_"); // Replace multiple underscores with single
     }
 
     /**
@@ -644,7 +666,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Start workout with selected mood and exercises
+     * Start workout with selected mood and exercises - UPDATED to pass GIF names
      */
     private void startWorkout() {
         if (selectedMood == null || recommendedExercises.isEmpty()) {
@@ -681,6 +703,10 @@ public class MoodWorkoutActivity extends AppCompatActivity {
             demoIntent.putExtra("exercise_calories", firstExercise.getEstimatedCalories());
             demoIntent.putExtra("exercise_category", firstExercise.getCategory().getDisplayName());
             demoIntent.putExtra("exercise_difficulty", firstExercise.getDifficulty().getDisplayName());
+
+            // NEW: Pass GIF name
+            String gifName = firstExercise.getImageUrl(); // Already set in exercise creation
+            demoIntent.putExtra("exercise_gif", gifName);
 
             startActivityForResult(demoIntent, 1001);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -821,10 +847,8 @@ public class MoodWorkoutActivity extends AppCompatActivity {
                 android.widget.Toast.LENGTH_SHORT).show();
     }
 
-
-
     /**
-     * Navigate to the next exercise in the sequence
+     * Navigate to the next exercise in the sequence - UPDATED to pass GIF names
      */
     private void navigateToNextExercise(int exerciseIndex) {
         if (exerciseIndex >= recommendedExercises.size()) {
@@ -855,6 +879,10 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         demoIntent.putExtra("exercise_calories", nextExercise.getEstimatedCalories());
         demoIntent.putExtra("exercise_category", nextExercise.getCategory().getDisplayName());
         demoIntent.putExtra("exercise_difficulty", nextExercise.getDifficulty().getDisplayName());
+
+        // NEW: Pass GIF name
+        String gifName = nextExercise.getImageUrl(); // Already set in exercise creation
+        demoIntent.putExtra("exercise_gif", gifName);
 
         startActivityForResult(demoIntent, 1001);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

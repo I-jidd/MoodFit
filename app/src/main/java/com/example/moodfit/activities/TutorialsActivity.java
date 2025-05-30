@@ -479,7 +479,7 @@ public class TutorialsActivity extends AppCompatActivity {
         TextView tvExerciseCalories = cardView.findViewById(R.id.tv_exercise_calories);
         TextView tvExerciseCategory = cardView.findViewById(R.id.tv_exercise_category);
         ImageView ivExerciseIcon = cardView.findViewById(R.id.iv_exercise_icon);
-        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif); // NEW: GIF view
+        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif); // GIF view
         CardView exerciseCardContainer = cardView.findViewById(R.id.exercise_card_container);
 
         // Set exercise data
@@ -584,7 +584,7 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Show exercise details
+     * Show exercise details - UPDATED to pass GIF name correctly
      */
     private void showExerciseDetails(Exercise exercise) {
         Intent detailIntent = new Intent(this, ExerciseDemoActivity.class);
@@ -597,7 +597,9 @@ public class TutorialsActivity extends AppCompatActivity {
         detailIntent.putExtra("exercise_calories", exercise.getEstimatedCalories());
         detailIntent.putExtra("exercise_category", exercise.getCategory().getDisplayName());
         detailIntent.putExtra("exercise_difficulty", exercise.getDifficulty().getDisplayName());
-        detailIntent.putExtra("exercise_gif", exercise.getImageUrl()); // NEW: Pass GIF name
+
+        // UPDATED: Pass GIF name - This is the key fix!
+        detailIntent.putExtra("exercise_gif", exercise.getImageUrl()); // This contains the GIF filename
 
         // Set as tutorial mode (not part of workout session)
         detailIntent.putExtra("tutorial_mode", true);
