@@ -125,12 +125,12 @@ public class TutorialsActivity extends AppCompatActivity {
         beginnerExercises.add(createExercise("Wall Push-Ups",
                 "Modified push-ups against a wall for beginners",
                 "Stand arm's length from wall, push and return. 3 sets of 10 reps",
-                DifficultyLevel.BEGINNER, WorkoutCategory.CARDIO, 8, 60));
+                DifficultyLevel.BEGINNER, WorkoutCategory.STRENGTH, 8, 60));
 
         beginnerExercises.add(createExercise("Seated Leg Lifts",
                 "Cardio workout you can do from a chair",
                 "Lift alternating legs while seated. 2 sets of 20 per leg",
-                DifficultyLevel.BEGINNER, WorkoutCategory.CARDIO, 6, 40));
+                DifficultyLevel.BEGINNER, WorkoutCategory.FLEXIBILITY, 6, 40));
 
         // Strength exercises
         beginnerExercises.add(createExercise("Chair Squats",
@@ -180,6 +180,8 @@ public class TutorialsActivity extends AppCompatActivity {
                 "Foundation of all standing poses",
                 "Stand tall, feet together, arms at sides. Focus on alignment for 1 minute",
                 DifficultyLevel.BEGINNER, WorkoutCategory.YOGA, 4, 20));
+
+        beginnerExercises.add(createExercise("Test","Test", "Test", DifficultyLevel.BEGINNER, WorkoutCategory.STRENGTH, 1, 1));
     }
 
     /**
