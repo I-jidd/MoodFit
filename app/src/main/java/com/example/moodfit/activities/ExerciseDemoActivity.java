@@ -68,10 +68,18 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     private String exerciseDifficulty;
     private String exerciseGifName; // NEW: GIF filename
 
+    private int exercisesCompleted = 0;
+    private int totalCaloriesBurned = 0;
+    private long workoutStartTime;
+    private boolean hasSkippedExercises = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercise_demo);
+
+        // Record workout start time
+        workoutStartTime = System.currentTimeMillis();
 
         // Initialize data management
         initializeDataManager();
@@ -490,7 +498,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Skip to next exercise
+     * Skip to next exercise - UPDATED to track skipped exercises
      */
     private void skipToNextExercise() {
         // Show confirmation dialog
@@ -499,19 +507,21 @@ public class ExerciseDemoActivity extends AppCompatActivity {
                 .setMessage("Are you sure you want to skip this exercise and move to the next one?")
                 .setPositiveButton("Continue Exercise", (dialog, which) -> dialog.dismiss())
                 .setNegativeButton("Skip", (dialog, which) -> {
+                    // Mark that exercises were skipped
+                    hasSkippedExercises = true;
                     proceedToNextExercise();
                 })
                 .show();
     }
 
     /**
-     * Proceed to next exercise in the routine
+     * Proceed to next exercise in the routine - UPDATED to track skipped exercises
      */
     private void proceedToNextExercise() {
         int nextExerciseIndex = currentExerciseIndex + 1;
 
         if (nextExerciseIndex >= totalExercises) {
-            // All exercises completed - show completion screen
+            // All exercises completed - show completion screen with real data
             showWorkoutCompletion();
         } else {
             // Move to next exercise demo
@@ -519,6 +529,12 @@ public class ExerciseDemoActivity extends AppCompatActivity {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("action", "next_exercise");
             resultIntent.putExtra("current_exercise_index", nextExerciseIndex);
+
+            // Pass current completion data
+            resultIntent.putExtra("exercises_completed", exercisesCompleted);
+            resultIntent.putExtra("calories_burned", totalCaloriesBurned);
+            resultIntent.putExtra("exercises_skipped", hasSkippedExercises);
+
             setResult(RESULT_OK, resultIntent);
             finish();
         }
@@ -543,9 +559,15 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle successful exercise completion
+     * Handle successful exercise completion - UPDATED to track completion data
      */
     private void handleExerciseCompletion(Intent data) {
+        // Increment completed exercises
+        exercisesCompleted++;
+
+        // Add calories for this exercise
+        totalCaloriesBurned += exerciseCalories;
+
         // Show completion feedback
         showExerciseCompletionFeedback();
 
@@ -648,14 +670,31 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Show workout completion screen
+     * Show workout completion screen - UPDATED with real workout data
      */
     private void showWorkoutCompletion() {
+        // Calculate actual workout duration
+        long workoutEndTime = System.currentTimeMillis();
+        int actualDurationMinutes = (int) ((workoutEndTime - workoutStartTime) / (1000 * 60));
+
+        // Ensure we have at least 1 minute
+        if (actualDurationMinutes < 1) {
+            actualDurationMinutes = 1;
+        }
+
         Intent completionIntent = new Intent(this, WorkoutCompleteActivity.class);
+
+        // Basic workout info
         completionIntent.putExtra("session_id", sessionId);
         completionIntent.putExtra("mood_type", workoutMood != null ? workoutMood.name() : "NEUTRAL");
         completionIntent.putExtra("total_exercises", totalExercises);
         completionIntent.putExtra("estimated_duration", estimatedDuration);
+
+        // NEW: Real completion data
+        completionIntent.putExtra("actual_duration", actualDurationMinutes);
+        completionIntent.putExtra("exercises_completed", exercisesCompleted);
+        completionIntent.putExtra("calories_burned", totalCaloriesBurned);
+        completionIntent.putExtra("exercises_skipped", hasSkippedExercises);
 
         startActivity(completionIntent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

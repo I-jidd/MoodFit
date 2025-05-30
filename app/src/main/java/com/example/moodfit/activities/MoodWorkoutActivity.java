@@ -57,6 +57,11 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     private List<Exercise> recommendedExercises = new ArrayList<>();
     private WorkoutSession currentSession = null;
 
+    private int totalExercisesCompleted = 0;
+    private int totalCaloriesBurned = 0;
+    private boolean anyExercisesSkipped = false;
+    private long workoutStartTime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -666,12 +671,15 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Start workout with selected mood and exercises - UPDATED to pass GIF names
+     * Start workout with selected mood and exercises - UPDATED to track start time
      */
     private void startWorkout() {
         if (selectedMood == null || recommendedExercises.isEmpty()) {
             return;
         }
+
+        // Record workout start time
+        workoutStartTime = System.currentTimeMillis();
 
         try {
             // Create workout session
@@ -704,8 +712,8 @@ public class MoodWorkoutActivity extends AppCompatActivity {
             demoIntent.putExtra("exercise_category", firstExercise.getCategory().getDisplayName());
             demoIntent.putExtra("exercise_difficulty", firstExercise.getDifficulty().getDisplayName());
 
-            // NEW: Pass GIF name
-            String gifName = firstExercise.getImageUrl(); // Already set in exercise creation
+            // Pass GIF name
+            String gifName = firstExercise.getImageUrl();
             demoIntent.putExtra("exercise_gif", gifName);
 
             startActivityForResult(demoIntent, 1001);
@@ -755,7 +763,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle results from exercise demo and timer activities - UPDATED
+     * Handle results from exercise demo and timer activities - UPDATED to track completion data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -764,6 +772,11 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         if (requestCode == 1001) { // Exercise demo result
             if (resultCode == RESULT_OK && data != null) {
                 String action = data.getStringExtra("action");
+
+                // Update completion tracking data
+                totalExercisesCompleted = data.getIntExtra("exercises_completed", totalExercisesCompleted);
+                totalCaloriesBurned = data.getIntExtra("calories_burned", totalCaloriesBurned);
+                anyExercisesSkipped = data.getBooleanExtra("exercises_skipped", anyExercisesSkipped);
 
                 if ("next_exercise".equals(action)) {
                     // Move to next exercise
@@ -783,6 +796,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
             }
         }
     }
+
 
     /**
      * Handle return from exercise demo when cancelled
@@ -848,7 +862,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Navigate to the next exercise in the sequence - UPDATED to pass GIF names
+     * Navigate to the next exercise in the sequence - UPDATED to pass completion data
      */
     private void navigateToNextExercise(int exerciseIndex) {
         if (exerciseIndex >= recommendedExercises.size()) {
@@ -880,8 +894,8 @@ public class MoodWorkoutActivity extends AppCompatActivity {
         demoIntent.putExtra("exercise_category", nextExercise.getCategory().getDisplayName());
         demoIntent.putExtra("exercise_difficulty", nextExercise.getDifficulty().getDisplayName());
 
-        // NEW: Pass GIF name
-        String gifName = nextExercise.getImageUrl(); // Already set in exercise creation
+        // Pass GIF name
+        String gifName = nextExercise.getImageUrl();
         demoIntent.putExtra("exercise_gif", gifName);
 
         startActivityForResult(demoIntent, 1001);
@@ -889,7 +903,7 @@ public class MoodWorkoutActivity extends AppCompatActivity {
     }
 
     /**
-     * Complete the workout session and save data
+     * Complete the workout session and save data - UPDATED to pass real completion data
      */
     private void completeWorkoutSession(Intent data) {
         if (currentSession == null) return;
@@ -898,17 +912,41 @@ public class MoodWorkoutActivity extends AppCompatActivity {
             // End the session
             currentSession.endWorkout();
 
+            // Calculate actual duration
+            long workoutEndTime = System.currentTimeMillis();
+            int actualDurationMinutes = (int) ((workoutEndTime - workoutStartTime) / (1000 * 60));
+            if (actualDurationMinutes < 1) {
+                actualDurationMinutes = 1;
+            }
+
             // Get actual duration from timer if available
             if (data != null && data.hasExtra("actual_duration")) {
-                int actualDuration = data.getIntExtra("actual_duration", 0);
-                currentSession.setDurationMinutes(actualDuration);
+                actualDurationMinutes = data.getIntExtra("actual_duration", actualDurationMinutes);
             }
+
+            currentSession.setDurationMinutes(actualDurationMinutes);
 
             // Save workout session
             dataManager.recordWorkoutCompletion(currentSession);
 
-            // Show completion message
-            showCompletionMessage();
+            // Navigate to completion screen with real data
+            Intent completionIntent = new Intent(this, WorkoutCompleteActivity.class);
+
+            // Basic workout info
+            completionIntent.putExtra("session_id", currentSession.getSessionId());
+            completionIntent.putExtra("mood_type", selectedMood.name());
+            completionIntent.putExtra("total_exercises", recommendedExercises.size());
+            completionIntent.putExtra("estimated_duration", getEstimatedTotalDuration());
+
+            // Real completion data
+            completionIntent.putExtra("actual_duration", actualDurationMinutes);
+            completionIntent.putExtra("exercises_completed", totalExercisesCompleted);
+            completionIntent.putExtra("calories_burned", totalCaloriesBurned);
+            completionIntent.putExtra("exercises_skipped", anyExercisesSkipped);
+
+            startActivity(completionIntent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            finish();
 
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error completing workout session", e);

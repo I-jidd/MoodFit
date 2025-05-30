@@ -18,6 +18,7 @@ import com.example.moodfit.utils.DataManager;
 /**
  * WorkoutCompleteActivity - Celebrates workout completion and shows summary
  * Displays workout stats, motivational messages, and navigation options
+ * UPDATED: Now syncs with actual workout data
  */
 public class WorkoutCompleteActivity extends AppCompatActivity {
 
@@ -37,11 +38,15 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     private Button btnBackToHome;
     private Button btnShareAchievement;
 
-    // Workout Data
+    // Workout Data - UPDATED with actual completion data
     private String sessionId;
     private MoodType workoutMood;
     private int totalExercises;
     private int estimatedDuration;
+    private int actualDuration; // NEW: Actual time spent
+    private int exercisesCompleted; // NEW: How many exercises actually completed
+    private int totalCaloriesBurned; // NEW: Estimated calories burned
+    private boolean wasSkipped; // NEW: If any exercises were skipped
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,7 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Extract data from intent
+     * Extract data from intent - UPDATED to get actual workout data
      */
     private void extractIntentData() {
         Intent intent = getIntent();
@@ -90,9 +95,43 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
                     workoutMood = MoodType.NEUTRAL;
                 }
             }
+
+            // Basic workout info
             totalExercises = intent.getIntExtra("total_exercises", 1);
             estimatedDuration = intent.getIntExtra("estimated_duration", 30);
+
+            // NEW: Actual completion data
+            actualDuration = intent.getIntExtra("actual_duration", estimatedDuration);
+            exercisesCompleted = intent.getIntExtra("exercises_completed", totalExercises);
+            totalCaloriesBurned = intent.getIntExtra("calories_burned", calculateEstimatedCalories());
+            wasSkipped = intent.getBooleanExtra("exercises_skipped", false);
         }
+    }
+
+    /**
+     * Calculate estimated calories if not provided
+     */
+    private int calculateEstimatedCalories() {
+        // Rough estimation: 5-8 calories per minute based on intensity
+        int caloriesPerMinute = 6; // Average
+
+        if (workoutMood != null) {
+            switch (workoutMood) {
+                case HAPPY:
+                case FRUSTRATED:
+                    caloriesPerMinute = 8; // Higher intensity
+                    break;
+                case STRESSED:
+                    caloriesPerMinute = 4; // Lower intensity/breathing
+                    break;
+                case NEUTRAL:
+                default:
+                    caloriesPerMinute = 6; // Moderate
+                    break;
+            }
+        }
+
+        return actualDuration * caloriesPerMinute;
     }
 
     /**
@@ -118,17 +157,17 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Display workout completion information
+     * Display workout completion information - UPDATED with real data
      */
     private void displayCompletionInfo() {
         // Set celebration icon based on mood
         setCelebrationIcon();
 
-        // Set congratulations title
-        tvCongratulationsTitle.setText("Workout Complete! 🎉");
+        // Set dynamic congratulations title
+        setDynamicCongratulationsTitle();
 
-        // Set workout summary
-        String summary = createWorkoutSummary();
+        // Set workout summary with real data
+        String summary = createDynamicWorkoutSummary();
         tvWorkoutSummary.setText(summary);
 
         // Update and display streak information
@@ -139,7 +178,22 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Set appropriate celebration icon based on workout mood
+     * NEW: Set dynamic congratulations title based on completion
+     */
+    private void setDynamicCongratulationsTitle() {
+        String title;
+        if (exercisesCompleted == totalExercises && !wasSkipped) {
+            title = "Workout Complete! 🎉";
+        } else if (exercisesCompleted > 0) {
+            title = "Great Progress! 💪";
+        } else {
+            title = "Every Start Counts! 👏";
+        }
+        tvCongratulationsTitle.setText(title);
+    }
+
+    /**
+     * Set appropriate celebration icon based on workout mood - UPDATED
      */
     private void setCelebrationIcon() {
         if (workoutMood != null) {
@@ -163,12 +217,12 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Create workout summary text
+     * Create dynamic workout summary with actual data - COMPLETELY UPDATED
      */
-    private String createWorkoutSummary() {
+    private String createDynamicWorkoutSummary() {
         StringBuilder summary = new StringBuilder();
 
-        // Workout type
+        // Workout type and mood
         if (workoutMood != null) {
             summary.append("You completed a ").append(workoutMood.getDisplayName().toLowerCase())
                     .append(" mood workout!\n\n");
@@ -176,32 +230,48 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
             summary.append("You completed your workout!\n\n");
         }
 
-        // Exercise count
-        summary.append("✅ ").append(totalExercises).append(" exercise")
-                .append(totalExercises > 1 ? "s" : "").append(" completed\n");
+        // Exercises completion status
+        if (exercisesCompleted == totalExercises) {
+            summary.append("✅ All ").append(totalExercises).append(" exercise")
+                    .append(totalExercises > 1 ? "s" : "").append(" completed\n");
+        } else if (exercisesCompleted > 0) {
+            summary.append("✅ ").append(exercisesCompleted).append(" of ").append(totalExercises)
+                    .append(" exercises completed\n");
+        } else {
+            summary.append("👏 You started your fitness journey!\n");
+        }
 
-        // Estimated time
-        summary.append("⏱️ ~").append(estimatedDuration).append(" minutes of activity\n");
+        // Time spent
+        summary.append("⏱️ ").append(actualDuration).append(" minute")
+                .append(actualDuration != 1 ? "s" : "").append(" of activity\n");
+
+        // Calories burned
+        summary.append("🔥 ~").append(totalCaloriesBurned).append(" calories burned\n");
 
         // Mood benefit
         if (workoutMood != null) {
             summary.append("😊 ").append(getMoodBenefit(workoutMood));
         }
 
+        // Add encouragement if workout was partial
+        if (exercisesCompleted < totalExercises) {
+            summary.append("\n\n💙 Progress over perfection - you're building healthy habits!");
+        }
+
         return summary.toString();
     }
 
     /**
-     * Get mood-specific benefit message
+     * Get mood-specific benefit message - UPDATED
      */
     private String getMoodBenefit(MoodType mood) {
         switch (mood) {
             case HAPPY:
                 return "Boosted your positive energy!";
             case STRESSED:
-                return "Reduced stress and tension!";
+                return "Reduced stress and found your center!";
             case FRUSTRATED:
-                return "Released frustration constructively!";
+                return "Released tension constructively!";
             case NEUTRAL:
                 return "Maintained your fitness routine!";
             default:
@@ -210,21 +280,24 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Update and display streak information
+     * Update and display streak information - UPDATED
      */
     private void updateStreakDisplay() {
         if (currentUser != null) {
-            // Update user streak
-            dataManager.updateUserStreak();
-
-            // Refresh user data to get updated streak
-            currentUser = dataManager.getCurrentUser();
+            // Only update streak if user completed at least one exercise
+            if (exercisesCompleted > 0) {
+                dataManager.updateUserStreak();
+                // Refresh user data to get updated streak
+                currentUser = dataManager.getCurrentUser();
+            }
 
             int currentStreak = currentUser.getCurrentStreak();
             int bestStreak = currentUser.getBestStreak();
 
             String streakText;
-            if (currentStreak == 1) {
+            if (exercisesCompleted == 0) {
+                streakText = "🔥 Ready to build your streak? Try again tomorrow!";
+            } else if (currentStreak == 1) {
                 streakText = "🔥 Great start! You've started a new streak!";
             } else if (currentStreak == bestStreak && currentStreak > 1) {
                 streakText = "🔥 New record! " + currentStreak + " day streak - your best yet!";
@@ -236,23 +309,46 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
 
             tvStreakUpdate.setText(streakText);
         } else {
-            tvStreakUpdate.setText("🔥 Great job completing your workout!");
+            tvStreakUpdate.setText("🔥 Great job on your workout!");
         }
     }
 
     /**
-     * Set appropriate motivational message
+     * Set appropriate motivational message - UPDATED based on completion
      */
     private void setMotivationalMessage() {
-        String[] messages = {
+        String[] fullCompletionMessages = {
                 "Every workout counts towards a healthier you!",
                 "You're building strength inside and out!",
                 "Consistency is the key to lasting change!",
                 "Your future self will thank you for this!",
-                "You've invested in your health today!",
-                "Progress, not perfection - and you're progressing!",
-                "You showed up for yourself today!"
+                "You've invested in your health today!"
         };
+
+        String[] partialCompletionMessages = {
+                "Progress, not perfection - and you're progressing!",
+                "You showed up for yourself today!",
+                "Every step forward is a victory!",
+                "Building habits takes time - you're on the right track!",
+                "The hardest part is starting - and you did it!"
+        };
+
+        String[] encouragementMessages = {
+                "Remember: every expert was once a beginner!",
+                "Your wellness journey is uniquely yours!",
+                "Small steps lead to big changes!",
+                "You're stronger than you think!",
+                "Tomorrow is a new opportunity to grow!"
+        };
+
+        String[] messages;
+        if (exercisesCompleted == totalExercises) {
+            messages = fullCompletionMessages;
+        } else if (exercisesCompleted > 0) {
+            messages = partialCompletionMessages;
+        } else {
+            messages = encouragementMessages;
+        }
 
         // Select message based on user's streak or random
         int messageIndex = 0;
@@ -332,11 +428,11 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Share workout achievement
+     * Share workout achievement - UPDATED with real data
      */
     private void shareAchievement() {
         try {
-            String shareText = createShareText();
+            String shareText = createDynamicShareText();
 
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -352,9 +448,9 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
     }
 
     /**
-     * Create share text for social media
+     * Create dynamic share text with actual workout data - UPDATED
      */
-    private String createShareText() {
+    private String createDynamicShareText() {
         StringBuilder shareText = new StringBuilder();
 
         shareText.append("🎉 Just completed my workout with MoodFit! ");
@@ -364,10 +460,21 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
                     .append(" mood into motivation! ");
         }
 
-        shareText.append("💪 ").append(totalExercises).append(" exercises done ");
+        if (exercisesCompleted == totalExercises) {
+            shareText.append("💪 ").append(totalExercises).append(" exercise")
+                    .append(totalExercises > 1 ? "s" : "").append(" completed ");
+        } else if (exercisesCompleted > 0) {
+            shareText.append("💪 ").append(exercisesCompleted).append(" exercise")
+                    .append(exercisesCompleted > 1 ? "s" : "").append(" done ");
+        }
+
+        shareText.append("⏱️ ").append(actualDuration).append(" minute")
+                .append(actualDuration != 1 ? "s" : "").append(" ");
+
+        shareText.append("🔥 ").append(totalCaloriesBurned).append(" calories burned ");
 
         if (currentUser != null && currentUser.getCurrentStreak() > 1) {
-            shareText.append("🔥 ").append(currentUser.getCurrentStreak()).append(" day streak! ");
+            shareText.append("📅 ").append(currentUser.getCurrentStreak()).append(" day streak! ");
         }
 
         shareText.append("\n\n#MoodFit #Fitness #Wellness #HealthyLifestyle");
