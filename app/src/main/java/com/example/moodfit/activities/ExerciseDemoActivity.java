@@ -44,6 +44,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     private TextView tvExerciseCalories;
     private TextView tvExerciseCategory;
     private TextView tvProgressIndicator;
+    private TextView tvExerciseCategoryBadge; // NEW: For the badge in GIF area
     private ImageView ivExerciseIcon;
     private ImageView ivExerciseGifDemo; // NEW: For GIF display
     private Button btnStartExercise;
@@ -135,7 +136,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Initialize all UI components - UPDATED to include GIF view
+     * Initialize all UI components - UPDATED to include category badge
      */
     private void initializeViews() {
         // Exercise information
@@ -152,6 +153,9 @@ public class ExerciseDemoActivity extends AppCompatActivity {
 
         // NEW: Exercise GIF view
         ivExerciseGifDemo = findViewById(R.id.iv_exercise_gif_demo);
+
+        // NEW: Category badge in GIF area
+        tvExerciseCategoryBadge = findViewById(R.id.tv_exercise_category_badge);
 
         // Buttons
         btnStartExercise = findViewById(R.id.btn_start_exercise);
@@ -170,7 +174,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * Display exercise information in the UI - UPDATED to include GIF loading
+     * Display exercise information in the UI - FIXED: Now includes all necessary calls
      */
     private void displayExerciseInfo() {
         // Set exercise details
@@ -183,14 +187,64 @@ public class ExerciseDemoActivity extends AppCompatActivity {
         tvExerciseCalories.setText("~" + exerciseCalories + " cal");
         tvExerciseCategory.setText(exerciseCategory != null ? exerciseCategory : "Fitness");
 
+        // NEW: Set dynamic category badge
+        if (tvExerciseCategoryBadge != null) {
+            String categoryText = exerciseCategory != null ? exerciseCategory : "Fitness";
+            tvExerciseCategoryBadge.setText(categoryText);
+
+            // Set category-specific background color
+            setCategoryBadgeColor(categoryText);
+        }
+
+        // FIXED: These calls were missing!
         // Set exercise icon based on category
         setExerciseIcon();
 
-        // NEW: Load exercise GIF
+        // Load exercise GIF
         loadExerciseGif();
 
         // Add entrance animation
         animateExerciseInfo();
+    }
+
+    /**
+     * NEW: Set category badge background color based on exercise category
+     */
+    private void setCategoryBadgeColor(String category) {
+        if (tvExerciseCategoryBadge == null || category == null) return;
+
+        int backgroundColor;
+        switch (category.toLowerCase()) {
+            case "cardio":
+                backgroundColor = getResources().getColor(R.color.success);
+                break;
+            case "strength":
+                backgroundColor = getResources().getColor(R.color.primary_color);
+                break;
+            case "flexibility":
+                backgroundColor = getResources().getColor(R.color.info);
+                break;
+            case "yoga":
+                backgroundColor = getResources().getColor(R.color.mood_happy);
+                break;
+            case "hiit":
+                backgroundColor = getResources().getColor(R.color.error);
+                break;
+            case "breathing":
+                backgroundColor = getResources().getColor(R.color.accent_color);
+                break;
+            default:
+                backgroundColor = getResources().getColor(R.color.primary_color);
+                break;
+        }
+        // Create rounded background drawable programmatically
+        android.graphics.drawable.GradientDrawable background = new android.graphics.drawable.GradientDrawable();
+        background.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        background.setColor(backgroundColor);
+        background.setCornerRadius(24f); // 12dp converted to pixels
+        background.setStroke(2, getResources().getColor(R.color.white)); // White border
+
+        tvExerciseCategoryBadge.setBackground(background);
     }
 
     /**
