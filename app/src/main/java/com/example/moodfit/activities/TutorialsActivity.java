@@ -10,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+
 import com.example.moodfit.R;
 import com.example.moodfit.models.Exercise;
 import com.example.moodfit.models.enums.DifficultyLevel;
@@ -467,7 +471,7 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Create exercise card view
+     * Create exercise card view - VERSION WITHOUT ICONS
      */
     private View createExerciseCard(Exercise exercise) {
         View cardView = getLayoutInflater().inflate(R.layout.item_exercise_card, null);
@@ -478,25 +482,36 @@ public class TutorialsActivity extends AppCompatActivity {
         TextView tvExerciseDuration = cardView.findViewById(R.id.tv_exercise_duration);
         TextView tvExerciseCalories = cardView.findViewById(R.id.tv_exercise_calories);
         TextView tvExerciseCategory = cardView.findViewById(R.id.tv_exercise_category);
-        ImageView ivExerciseIcon = cardView.findViewById(R.id.iv_exercise_icon);
-        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif); // GIF view
+        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif); // GIF view only
         CardView exerciseCardContainer = cardView.findViewById(R.id.exercise_card_container);
 
-        // Set exercise data
-        tvExerciseName.setText(exercise.getName());
-        tvExerciseDescription.setText(exercise.getDescription());
-        tvExerciseDuration.setText(exercise.getEstimatedDurationMinutes() + " min");
-        tvExerciseCalories.setText("~" + exercise.getEstimatedCalories() + " cal");
-        tvExerciseCategory.setText(exercise.getCategory().getDisplayName());
+        // Set exercise data with null checks
+        if (tvExerciseName != null) {
+            tvExerciseName.setText(exercise.getName());
+        }
+        if (tvExerciseDescription != null) {
+            tvExerciseDescription.setText(exercise.getDescription());
+        }
+        if (tvExerciseDuration != null) {
+            tvExerciseDuration.setText(exercise.getEstimatedDurationMinutes() + " min");
+        }
+        if (tvExerciseCalories != null) {
+            tvExerciseCalories.setText("~" + exercise.getEstimatedCalories() + " cal");
+        }
+        if (tvExerciseCategory != null) {
+            tvExerciseCategory.setText(exercise.getCategory().getDisplayName());
+        }
 
-        // Set category icon
-        setExerciseIcon(ivExerciseIcon, exercise.getCategory());
-
+        // REMOVED: No more icon logic - only GIF loading
         // Load exercise GIF
-        loadExerciseGif(ivExerciseGif, exercise);
+        if (ivExerciseGif != null) {
+            loadExerciseGif(ivExerciseGif, exercise);
+        }
 
         // Set click listener to view exercise details
-        exerciseCardContainer.setOnClickListener(v -> showExerciseDetails(exercise));
+        if (exerciseCardContainer != null) {
+            exerciseCardContainer.setOnClickListener(v -> showExerciseDetails(exercise));
+        }
 
         // Set margin
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -509,7 +524,7 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Load exercise GIF or show placeholder - UPDATED with debug logging
+     * Load exercise GIF using Glide for animation support
      */
     private void loadExerciseGif(ImageView gifView, Exercise exercise) {
         String gifName = exercise.getImageUrl(); // GIF filename stored in imageUrl
@@ -526,10 +541,19 @@ public class TutorialsActivity extends AppCompatActivity {
             android.util.Log.d("GIF_DEBUG", "Resource ID: " + gifResourceId + " (0 means not found)");
 
             if (gifResourceId != 0) {
-                // GIF exists, load it
-                gifView.setImageResource(gifResourceId);
+                // GIF exists, load it with Glide for animation
+                Glide.with(this)
+                        .asGif() // Explicitly load as GIF
+                        .load(gifResourceId)
+                        .apply(new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.default_exercise_demo)
+                                .error(R.drawable.default_exercise_demo)
+                                .centerCrop()) // Fit nicely in the card
+                        .into(gifView);
+
                 gifView.setVisibility(View.VISIBLE);
-                android.util.Log.d("GIF_DEBUG", "✅ GIF loaded successfully!");
+                android.util.Log.d("GIF_DEBUG", "✅ Animated GIF loaded successfully in exercise card!");
             } else {
                 // GIF doesn't exist yet, show placeholder
                 android.util.Log.d("GIF_DEBUG", "❌ GIF not found, showing placeholder");
@@ -543,21 +567,29 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Show placeholder when GIF is not available
+     * Show placeholder when GIF is not available - Updated to use Glide
      */
     private void showGifPlaceholder(ImageView gifView, Exercise exercise) {
-        // Show default exercise placeholder
-        gifView.setImageResource(R.drawable.default_exercise_demo);
-        gifView.setVisibility(View.VISIBLE);
+        // Load placeholder with Glide for consistency
+        Glide.with(this)
+                .load(R.drawable.default_exercise_demo)
+                .apply(new RequestOptions().centerCrop())
+                .into(gifView);
 
-        // You can also set a text overlay indicating "GIF Coming Soon"
+        gifView.setVisibility(View.VISIBLE);
         gifView.setAlpha(0.7f);
     }
 
     /**
-     * Set appropriate icon based on exercise category
+     * Set appropriate icon based on exercise category - UPDATED with null check
      */
     private void setExerciseIcon(ImageView imageView, WorkoutCategory category) {
+        // Add null check to prevent crash
+        if (imageView == null) {
+            android.util.Log.w(TAG, "ImageView is null - cannot set exercise icon");
+            return;
+        }
+
         switch (category) {
             case CARDIO:
                 imageView.setImageResource(R.drawable.ic_cardio);

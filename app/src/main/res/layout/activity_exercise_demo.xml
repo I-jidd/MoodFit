@@ -79,24 +79,15 @@
                     android:layout_height="match_parent"
                     android:padding="8dp">
 
-                    <!-- ADD THIS TO YOUR EXISTING LAYOUT -->
-                    <androidx.cardview.widget.CardView
+                    <!-- Exercise GIF (main demonstration) -->
+                    <ImageView
+                        android:id="@+id/iv_exercise_gif_demo"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:layout_margin="16dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="4dp"
-                        app:cardBackgroundColor="@color/card_background">
-
-                        <ImageView
-                            android:id="@+id/iv_exercise_gif_demo"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_margin="8dp"
-                            android:scaleType="centerCrop"
-                            android:background="@drawable/default_exercise_demo" />
-
-                    </androidx.cardview.widget.CardView>
+                        android:layout_height="match_parent"
+                        android:layout_margin="8dp"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/default_exercise_demo"
+                        android:visibility="visible" />
 
                     <!-- Fallback Exercise Icon (when no GIF) -->
                     <ImageView
@@ -109,17 +100,6 @@
                         android:visibility="visible"
                         app:tint="@color/primary_color"
                         tools:src="@drawable/ic_cardio" />
-
-                    <!-- Play overlay -->
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_play_demo"
-                        android:background="@color/white"
-                        android:padding="8dp"
-                        android:elevation="4dp"
-                        android:alpha="0.9" />
 
                     <!-- Category Badge -->
                     <TextView

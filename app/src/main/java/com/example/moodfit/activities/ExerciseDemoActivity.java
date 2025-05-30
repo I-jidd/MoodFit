@@ -17,6 +17,11 @@ import com.example.moodfit.models.WorkoutSession;
 import com.example.moodfit.models.enums.MoodType;
 import com.example.moodfit.utils.DataManager;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestOptions;
+
 import java.util.List;
 
 /**
@@ -223,7 +228,7 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * NEW: Load exercise GIF or show placeholder
+     * Load exercise GIF using Glide for animation support
      */
     private void loadExerciseGif() {
         if (ivExerciseGifDemo == null) {
@@ -248,14 +253,22 @@ public class ExerciseDemoActivity extends AppCompatActivity {
             android.util.Log.d("GIF_DEBUG", "Resource ID: " + gifResourceId + " (0 means not found)");
 
             if (gifResourceId != 0) {
-                // GIF exists, load it
-                ivExerciseGifDemo.setImageResource(gifResourceId);
+                // GIF exists, load it with Glide for animation
+                Glide.with(this)
+                        .asGif() // Explicitly load as GIF
+                        .load(gifResourceId)
+                        .apply(new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.default_exercise_demo)
+                                .error(R.drawable.default_exercise_demo))
+                        .into(ivExerciseGifDemo);
+
                 ivExerciseGifDemo.setVisibility(View.VISIBLE);
 
-                // Hide the fallback icon since we have a GIF
+                // Hide the fallback icon since we have an animated GIF
                 ivExerciseIcon.setVisibility(View.GONE);
 
-                android.util.Log.d("GIF_DEBUG", "✅ GIF loaded successfully!");
+                android.util.Log.d("GIF_DEBUG", "✅ Animated GIF loaded successfully with Glide!");
             } else {
                 // GIF doesn't exist yet, show placeholder and icon
                 android.util.Log.d("GIF_DEBUG", "❌ GIF not found, showing placeholder");
@@ -282,16 +295,47 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     }
 
     /**
-     * NEW: Show placeholder when GIF is not available
+     * Show placeholder when GIF is not available - Updated to use Glide
      */
     private void showGifPlaceholder() {
-        // Show default exercise placeholder in the GIF view
-        ivExerciseGifDemo.setImageResource(R.drawable.default_exercise_demo);
+        // Load placeholder with Glide for consistency
+        Glide.with(this)
+                .load(R.drawable.default_exercise_demo)
+                .into(ivExerciseGifDemo);
+
         ivExerciseGifDemo.setVisibility(View.VISIBLE);
         ivExerciseGifDemo.setAlpha(0.7f);
 
         // Keep the icon visible as well
         ivExerciseIcon.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Control GIF animation (useful for performance)
+     */
+    private void pauseGifAnimation() {
+        if (ivExerciseGifDemo != null && ivExerciseGifDemo.getDrawable() instanceof GifDrawable) {
+            ((GifDrawable) ivExerciseGifDemo.getDrawable()).stop();
+        }
+    }
+
+    private void resumeGifAnimation() {
+        if (ivExerciseGifDemo != null && ivExerciseGifDemo.getDrawable() instanceof GifDrawable) {
+            ((GifDrawable) ivExerciseGifDemo.getDrawable()).start();
+        }
+    }
+
+    // Optional: Add lifecycle methods to manage GIF performance
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pauseGifAnimation(); // Save battery when activity is not visible
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeGifAnimation(); // Resume animation when activity becomes visible
     }
 
     /**

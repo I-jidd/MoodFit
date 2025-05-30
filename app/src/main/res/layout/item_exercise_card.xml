@@ -42,16 +42,16 @@
                 android:background="@drawable/default_exercise_demo"
                 android:visibility="visible" />
 
-            <!-- Exercise Icon (fallback/overlay) -->
-            <ImageView
-                android:id="@+id/iv_exercise_icon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_cardio"
-                android:alpha="0.7"
-                app:tint="@color/primary_color"
-                tools:src="@drawable/ic_cardio" />
+<!--            &lt;!&ndash; Exercise Icon (fallback/overlay) &ndash;&gt;-->
+<!--            <ImageView-->
+<!--                android:id="@+id/iv_exercise_icon"-->
+<!--                android:layout_width="32dp"-->
+<!--                android:layout_height="32dp"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:src="@drawable/ic_cardio"-->
+<!--                android:alpha="0.7"-->
+<!--                app:tint="@color/primary_color"-->
+<!--                tools:src="@drawable/ic_cardio" />-->
 
             <!-- Play overlay to indicate it's a demo -->
             <ImageView
@@ -99,65 +99,74 @@
                 android:ellipsize="end"
                 tools:text="Classic upper body strength builder" />
 
-            <!-- Exercise Stats -->
+            <!-- FIXED: Exercise Stats - More Responsive Layout -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_marginTop="8dp">
 
-                <!-- Duration -->
+                <!-- First Row: Duration and Calories -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginEnd="16dp">
+                    android:layout_marginBottom="4dp">
 
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_timer"
-                        android:layout_marginEnd="4dp"
-                        app:tint="@color/accent_color" />
-
-                    <TextView
-                        android:id="@+id/tv_exercise_duration"
-                        android:layout_width="wrap_content"
+                    <!-- Duration -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="10 min"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_secondary"
-                        tools:text="10 min" />
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_timer"
+                            android:layout_marginEnd="4dp"
+                            app:tint="@color/accent_color" />
+
+                        <TextView
+                            android:id="@+id/tv_exercise_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10 min"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            tools:text="10 min" />
+
+                    </LinearLayout>
+
+                    <!-- Calories -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:src="@drawable/ic_flame_small"
+                            android:layout_marginEnd="4dp" />
+
+                        <TextView
+                            android:id="@+id/tv_exercise_calories"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="~90 cal"
+                            android:textSize="12sp"
+                            android:textColor="@color/text_secondary"
+                            tools:text="~90 cal" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <!-- Calories -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginEnd="16dp">
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/ic_flame_small"
-                        android:layout_marginEnd="4dp" />
-
-                    <TextView
-                        android:id="@+id/tv_exercise_calories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="~90 cal"
-                        android:textSize="12sp"
-                        android:textColor="@color/text_secondary"
-                        tools:text="~90 cal" />
-
-                </LinearLayout>
-
-                <!-- Category -->
+                <!-- Second Row: Category Badge (Full Width Available) -->
                 <TextView
                     android:id="@+id/tv_exercise_category"
                     android:layout_width="wrap_content"
@@ -165,10 +174,11 @@
                     android:text="Strength"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    android:textColor="@color/primary_color"
-                    android:background="@drawable/streak_badge_background"
+                    android:textColor="@color/white"
+                    android:background="@color/primary_color"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
+                    android:layout_gravity="start"
                     tools:text="Strength" />
 
             </LinearLayout>
