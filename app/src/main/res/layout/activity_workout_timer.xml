@@ -9,8 +9,6 @@
     android:gravity="center">
 
     <!-- Header -->
-
-    <!-- Timer Selection -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,6 +20,7 @@
         android:textSize="28sp"
         android:textStyle="bold" />
 
+    <!-- Timer Selection -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,6 +60,7 @@
 
     <!-- Large Timer Display -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/timer_card"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_marginBottom="48dp"

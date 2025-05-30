@@ -12,9 +12,9 @@ public class WorkoutTimer {
     public interface TimerListener {
         void onTick(int remainingSeconds);
         void onFinish();
-        void onStart();
-        void onPause();
-        void onResume();
+        void onTimerStart();
+        void onTimerPause();
+        void onTimerResume();
     }
 
     // Constructors
@@ -30,7 +30,7 @@ public class WorkoutTimer {
         if (!isRunning && !isPaused) {
             isRunning = true;
             startTime = System.currentTimeMillis();
-            if (listener != null) listener.onStart();
+            if (listener != null) listener.onTimerStart();
         }
     }
 
@@ -38,7 +38,7 @@ public class WorkoutTimer {
         if (isRunning && !isPaused) {
             isPaused = true;
             pausedTime = System.currentTimeMillis();
-            if (listener != null) listener.onPause();
+            if (listener != null) listener.onTimerPause();
         }
     }
 
@@ -48,7 +48,7 @@ public class WorkoutTimer {
             // Adjust start time to account for pause duration
             long pauseDuration = System.currentTimeMillis() - pausedTime;
             startTime += pauseDuration;
-            if (listener != null) listener.onResume();
+            if (listener != null) listener.onTimerResume();
         }
     }
 
