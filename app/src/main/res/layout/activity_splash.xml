@@ -29,7 +29,8 @@
             android:layout_height="120dp"
             android:src="@drawable/ic_moodfit_logo"
             android:contentDescription="MoodFit app logo"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:alpha="0" />
 
         <!-- App Name -->
         <TextView
@@ -42,7 +43,8 @@
             android:textStyle="bold"
             android:fontFamily="@font/barlow_semibold"
             android:letterSpacing="0.02"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:visibility="invisible" />
 
         <!-- Tagline -->
         <TextView
@@ -53,7 +55,8 @@
             android:textSize="18sp"
             android:textColor="@color/splash_text_secondary"
             android:fontFamily="@font/opensans_regular"
-            android:alpha="0.9" />
+            android:alpha="0.9"
+            android:visibility="invisible" />
 
     </LinearLayout>
 
@@ -79,6 +82,7 @@
             android:layout_marginBottom="16dp" />
 
         <TextView
+            android:id="@+id/tv_loading_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Getting ready..."
