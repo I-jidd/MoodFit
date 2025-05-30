@@ -9,13 +9,13 @@ import androidx.cardview.widget.CardView;
 
 import com.example.moodfit.R;
 import com.example.moodfit.models.User;
-import com.example.moodfit.models.UserProgress;
 import com.example.moodfit.models.MotivationalQuote;
 import com.example.moodfit.utils.DataManager;
 
 /**
  * HomeActivity - Main dashboard of the MoodFit app
  * Provides access to all major features and displays user progress
+ * UPDATED: Enhanced DataManager integration with proper error handling
  */
 public class HomeActivity extends AppCompatActivity {
 
@@ -46,14 +46,14 @@ public class HomeActivity extends AppCompatActivity {
 
     // User Data
     private User currentUser;
-    private UserProgress userProgress;
+    private DataManager.UserStats userStats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Initialize data manager
+        // Initialize data manager FIRST
         initializeDataManager();
 
         // Initialize UI components
@@ -67,13 +67,27 @@ public class HomeActivity extends AppCompatActivity {
 
         // Load daily motivational quote
         loadDailyQuote();
+
+        // Show welcome animation for first-time users
+        checkAndShowWelcomeAnimation();
     }
 
     /**
-     * Initialize data management components
+     * Initialize data management components with error handling
      */
     private void initializeDataManager() {
-        dataManager = new DataManager(this);
+        try {
+            dataManager = new DataManager(this);
+
+            // Ensure app is properly initialized
+            dataManager.initializeApp();
+
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error initializing data manager", e);
+
+            // Show error to user and provide fallback
+            showErrorMessage("Unable to load app data. Some features may not work correctly.");
+        }
     }
 
     /**
@@ -102,91 +116,80 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Load user data and update UI
+     * Load user data and update UI with comprehensive error handling
      */
     private void loadUserData() {
         try {
-            // Get current user
+            // Get current user from DataManager
             currentUser = dataManager.getCurrentUser();
-            userProgress = dataManager.getUserProgress();
 
-            // Update user greeting
+            // Get comprehensive user statistics
+            userStats = dataManager.getUserStats();
+
+            // Update all UI components
             updateUserGreeting();
-
-            // Update stats display
             updateStatsDisplay();
-
-            // Update streak information
             updateStreakDisplay();
+
+            android.util.Log.d(TAG, "User data loaded successfully");
 
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error loading user data", e);
             showDefaultContent();
+            showErrorMessage("Unable to load your profile data.");
         }
     }
 
     /**
-     * Update the welcome message and greeting
+     * Update the welcome message and greeting using DataManager
      */
     private void updateUserGreeting() {
-        if (currentUser != null) {
-            // Set personalized welcome message
-            tvWelcomeMessage.setText(currentUser.getWelcomeMessage());
+        try {
+            if (currentUser != null) {
+                // Use the user's built-in welcome message
+                tvWelcomeMessage.setText(currentUser.getWelcomeMessage());
 
-            // Set motivational greeting based on user's progress
-            String greetingMessage = getContextualGreeting();
-            tvGreetingMessage.setText(greetingMessage);
-        } else {
-            // Fallback for new users
+                // Use the user's built-in motivational message
+                String greetingMessage = currentUser.getMotivationalMessage();
+                tvGreetingMessage.setText(greetingMessage);
+
+            } else {
+                // Fallback for edge cases
+                tvWelcomeMessage.setText("Welcome to MoodFit!");
+                tvGreetingMessage.setText("Ready to start your fitness journey?");
+            }
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error updating user greeting", e);
             tvWelcomeMessage.setText("Welcome to MoodFit!");
-            tvGreetingMessage.setText("Ready to start your fitness journey?");
+            tvGreetingMessage.setText("Ready to get moving?");
         }
     }
 
     /**
-     * Get contextual greeting based on user activity
-     */
-    private String getContextualGreeting() {
-        if (currentUser == null) {
-            return "Ready to start your fitness journey?";
-        }
-
-        // Check if user worked out today
-        if (currentUser.hasWorkedOutToday()) {
-            return "Great job today! Keep the momentum going!";
-        }
-
-        // Check current streak for motivation
-        int streak = currentUser.getCurrentStreak();
-        if (streak == 0) {
-            return "Ready to start a new streak?";
-        } else if (streak < 3) {
-            return "Let's keep building that streak!";
-        } else if (streak < 7) {
-            return "You're on fire! 🔥 Keep it up!";
-        } else {
-            return "Incredible dedication! You're unstoppable!";
-        }
-    }
-
-    /**
-     * Update the stats display
+     * Update the stats display using UserStats from DataManager
      */
     private void updateStatsDisplay() {
-        if (currentUser != null && userProgress != null) {
-            // Workouts this week
-            int workoutsThisWeek = dataManager.getWorkoutsThisWeek();
-            tvWorkoutsThisWeek.setText(String.valueOf(workoutsThisWeek));
+        try {
+            if (userStats != null) {
+                // Use comprehensive stats from DataManager
+                tvWorkoutsThisWeek.setText(String.valueOf(userStats.workoutsThisWeek));
+                tvTotalMinutes.setText(String.valueOf(userStats.totalMinutes));
+                tvBestStreak.setText(String.valueOf(userStats.bestStreak));
 
-            // Total minutes
-            int totalMinutes = dataManager.getTotalWorkoutMinutes();
-            tvTotalMinutes.setText(String.valueOf(totalMinutes));
+            } else {
+                // Fallback to individual DataManager calls
+                tvWorkoutsThisWeek.setText(String.valueOf(dataManager.getWorkoutsThisWeek()));
+                tvTotalMinutes.setText(String.valueOf(dataManager.getTotalWorkoutMinutes()));
 
-            // Best streak
-            int bestStreak = currentUser.getBestStreak();
-            tvBestStreak.setText(String.valueOf(bestStreak));
-        } else {
-            // Show zeros for new users
+                if (currentUser != null) {
+                    tvBestStreak.setText(String.valueOf(currentUser.getBestStreak()));
+                } else {
+                    tvBestStreak.setText("0");
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error updating stats display", e);
+            // Show zeros for error cases
             tvWorkoutsThisWeek.setText("0");
             tvTotalMinutes.setText("0");
             tvBestStreak.setText("0");
@@ -197,10 +200,16 @@ public class HomeActivity extends AppCompatActivity {
      * Update streak display in header
      */
     private void updateStreakDisplay() {
-        if (currentUser != null) {
-            int currentStreak = currentUser.getCurrentStreak();
-            tvCurrentStreak.setText(String.valueOf(currentStreak));
-        } else {
+        try {
+            if (userStats != null) {
+                tvCurrentStreak.setText(String.valueOf(userStats.currentStreak));
+            } else if (currentUser != null) {
+                tvCurrentStreak.setText(String.valueOf(currentUser.getCurrentStreak()));
+            } else {
+                tvCurrentStreak.setText("0");
+            }
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error updating streak display", e);
             tvCurrentStreak.setText("0");
         }
     }
@@ -258,37 +267,41 @@ public class HomeActivity extends AppCompatActivity {
         };
 
         for (CardView card : cards) {
-            card.setOnTouchListener((v, event) -> {
-                switch (event.getAction()) {
-                    case android.view.MotionEvent.ACTION_DOWN:
-                        v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).start();
-                        break;
-                    case android.view.MotionEvent.ACTION_UP:
-                    case android.view.MotionEvent.ACTION_CANCEL:
-                        v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
-                        break;
-                }
-                return false; // Let the click listener handle the actual click
-            });
+            if (card != null) {
+                card.setOnTouchListener((v, event) -> {
+                    switch (event.getAction()) {
+                        case android.view.MotionEvent.ACTION_DOWN:
+                            v.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).start();
+                            break;
+                        case android.view.MotionEvent.ACTION_UP:
+                        case android.view.MotionEvent.ACTION_CANCEL:
+                            v.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start();
+                            break;
+                    }
+                    return false; // Let the click listener handle the actual click
+                });
+            }
         }
     }
 
     /**
-     * Load and display daily motivational quote
+     * Load and display daily motivational quote using DataManager
      */
     private void loadDailyQuote() {
         try {
             MotivationalQuote dailyQuote = dataManager.getDailyQuote();
-            if (dailyQuote != null) {
+
+            if (dailyQuote != null && dailyQuote.getText() != null) {
                 String quoteText = "\"" + dailyQuote.getText() + "\"";
                 tvDailyQuote.setText(quoteText);
             } else {
                 // Fallback quote
-                tvDailyQuote.setText("\"The only bad workout is the one that didn't happen.\"");
+                tvDailyQuote.setText("\"Take care of your body. It's the only place you have to live.\"");
             }
+
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error loading daily quote", e);
-            tvDailyQuote.setText("\"Take care of your body. It's the only place you have to live.\"");
+            tvDailyQuote.setText("\"Every workout brings you one step closer to your goals.\"");
         }
     }
 
@@ -305,20 +318,60 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * Check and show welcome animation for first-time users
+     */
+    private void checkAndShowWelcomeAnimation() {
+        try {
+            if (currentUser != null && currentUser.isFirstTimeUser()) {
+                showWelcomeAnimation();
+            }
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error checking first-time user status", e);
+        }
+    }
+
+    /**
+     * Show welcome animation for first-time users
+     */
+    private void showWelcomeAnimation() {
+        View rootView = findViewById(android.R.id.content);
+        if (rootView != null) {
+            rootView.setAlpha(0f);
+            rootView.animate()
+                    .alpha(1f)
+                    .setDuration(800)
+                    .setStartDelay(200)
+                    .start();
+        }
+    }
+
+    /**
+     * Show error message to user
+     */
+    private void showErrorMessage(String message) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    /**
      * Refresh data when returning to this activity
      */
     @Override
     protected void onResume() {
         super.onResume();
 
-        // Update user streak (in case they completed a workout in another activity)
-        dataManager.updateUserStreak();
+        try {
+            // Update user streak using DataManager (handles all business logic)
+            dataManager.updateUserStreak();
 
-        // Refresh user data
-        loadUserData();
+            // Refresh user data
+            loadUserData();
 
-        // Refresh daily quote (in case it's a new day)
-        loadDailyQuote();
+            // Refresh daily quote
+            loadDailyQuote();
+
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error during onResume", e);
+        }
     }
 
     /**
@@ -331,15 +384,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Clean up resources
-     */
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Any cleanup if needed
-    }
-
-    /**
      * Handle activity results from child activities
      */
     @Override
@@ -348,23 +392,13 @@ public class HomeActivity extends AppCompatActivity {
 
         // Refresh data if a workout was completed
         if (resultCode == RESULT_OK) {
-            loadUserData();
-        }
-    }
-
-    /**
-     * Utility method to show a welcome animation for first-time users
-     */
-    private void showWelcomeAnimation() {
-        if (currentUser != null && currentUser.isFirstTimeUser()) {
-            // Add a subtle welcome animation
-            View rootView = findViewById(android.R.id.content);
-            rootView.setAlpha(0f);
-            rootView.animate()
-                    .alpha(1f)
-                    .setDuration(800)
-                    .setStartDelay(200)
-                    .start();
+            try {
+                // Force refresh of cached data
+                dataManager.refreshData();
+                loadUserData();
+            } catch (Exception e) {
+                android.util.Log.e(TAG, "Error refreshing data after activity result", e);
+            }
         }
     }
 
@@ -372,7 +406,25 @@ public class HomeActivity extends AppCompatActivity {
      * Method to manually refresh data (can be called from settings or other activities)
      */
     public void refreshData() {
-        loadUserData();
-        loadDailyQuote();
+        try {
+            dataManager.refreshData();
+            loadUserData();
+            loadDailyQuote();
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error during manual data refresh", e);
+            showErrorMessage("Unable to refresh data. Please try again.");
+        }
+    }
+
+    /**
+     * Clean up resources
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up DataManager caches if needed
+        if (dataManager != null) {
+            dataManager.clearCaches();
+        }
     }
 }
