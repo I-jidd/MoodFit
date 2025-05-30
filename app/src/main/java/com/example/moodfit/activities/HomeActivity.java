@@ -232,7 +232,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // Exercise demos
         cardExerciseDemos.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ExerciseDemoActivity.class);
+            Intent intent = new Intent(this, TutorialsActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });

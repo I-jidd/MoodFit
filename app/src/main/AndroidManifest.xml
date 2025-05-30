@@ -65,6 +65,11 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
         </activity>
+        <activity
+            android:name=".activities.TutorialsActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
 
     </application>
 
