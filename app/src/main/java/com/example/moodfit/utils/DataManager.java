@@ -89,11 +89,15 @@ public class DataManager {
 
         if (isSameDay(yesterday, lastWorkout) || user.getCurrentStreak() == 0) {
             // Consecutive day or starting new streak
+            int oldStreak = user.getCurrentStreak();
             user.incrementStreak();
+            android.util.Log.d(TAG, "Streak incremented from " + oldStreak + " to " + user.getCurrentStreak());
         } else {
             // Reset streak if gap is more than 1 day
+            int oldStreak = user.getCurrentStreak();
             user.resetStreak();
             user.incrementStreak(); // Start new streak with today
+            android.util.Log.d(TAG, "Streak reset and restarted. Was " + oldStreak + ", now " + user.getCurrentStreak());
         }
 
         updateUser(user);

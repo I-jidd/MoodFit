@@ -360,8 +360,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
 
         try {
-            // Update user streak using DataManager (handles all business logic)
-            dataManager.updateUserStreak();
 
             // Refresh user data
             loadUserData();
