@@ -28,13 +28,32 @@
         android:gravity="center"
         android:layout_marginBottom="40dp">
 
-        <ImageView
-            android:id="@+id/iv_flame_icon"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_flame"
-            android:contentDescription="Streak flame icon"
-            android:layout_marginBottom="16dp" />
+        <!-- Flame Icon Container with background circle for enhanced effect -->
+        <FrameLayout
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginBottom="16dp">
+
+            <!-- Background circle for glow effect -->
+            <View
+                android:id="@+id/flame_glow_background"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:background="@drawable/flame_glow_background"
+                android:alpha="0.3" />
+
+            <!-- Main flame icon -->
+            <ImageView
+                android:id="@+id/iv_flame_icon"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_flame"
+                android:contentDescription="Streak flame icon"
+                android:scaleType="centerInside" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tv_streak_count"
