@@ -353,21 +353,90 @@ public class UsernameSetupActivity extends AppCompatActivity {
     }
 
     /**
-     * Complete the onboarding process
+     * FIXED: Enhanced onboarding completion with proper error handling and validation
      */
     private void completeOnboarding() {
         try {
-            // Mark onboarding as completed
+            android.util.Log.d(TAG, "Starting onboarding completion process");
+
+            // First, validate that we can complete onboarding
+            if (!onboardingData.canProceedFromCurrentStep()) {
+                android.util.Log.e(TAG, "Cannot complete onboarding - current step validation failed");
+                showErrorMessage("Please complete all required fields");
+                return;
+            }
+
+            if (onboardingData.getCurrentStep() != OnboardingData.TOTAL_STEPS) {
+                android.util.Log.e(TAG, "Cannot complete onboarding - not on final step");
+                showErrorMessage("Please complete all setup steps");
+                return;
+            }
+
+            // Mark onboarding as completed in the data object
             onboardingData.completeOnboarding();
 
+            // Validate that onboarding was marked complete
+            if (!onboardingData.isOnboardingCompleted()) {
+                android.util.Log.e(TAG, "Failed to mark onboarding as completed");
+                showErrorMessage("Setup validation failed. Please try again.");
+                return;
+            }
+
             // Create user from onboarding data
-            User user = onboardingData.createUser();
+            User user = null;
+            try {
+                user = onboardingData.createUser();
+                android.util.Log.d(TAG, "User created successfully: " + user.getUsername());
+            } catch (Exception userCreationError) {
+                android.util.Log.e(TAG, "Failed to create user", userCreationError);
+                showErrorMessage("Failed to create user profile. Please check your information.");
+                return;
+            }
 
-            // Save user data
-            prefsHelper.saveUser(user);
+            // Save user data with verification
+            try {
+                prefsHelper.saveUser(user);
 
-            // Mark onboarding as completed in preferences
-            prefsHelper.setOnboardingCompleted(true);
+                // Verify user was saved
+                User savedUser = prefsHelper.getUser();
+                if (savedUser == null || savedUser.getUsername() == null) {
+                    throw new Exception("User verification failed after saving");
+                }
+                android.util.Log.d(TAG, "User saved and verified successfully");
+
+            } catch (Exception userSaveError) {
+                android.util.Log.e(TAG, "Failed to save user", userSaveError);
+                showErrorMessage("Failed to save user data. Please try again.");
+                return;
+            }
+
+            // Mark onboarding as completed in preferences with verification
+            try {
+                prefsHelper.setOnboardingCompleted(true);
+
+                // Verify onboarding completion was saved
+                boolean isCompleted = prefsHelper.isOnboardingCompleted();
+                if (!isCompleted) {
+                    throw new Exception("Onboarding completion verification failed");
+                }
+                android.util.Log.d(TAG, "Onboarding completion saved and verified");
+
+            } catch (Exception completionSaveError) {
+                android.util.Log.e(TAG, "Failed to save onboarding completion", completionSaveError);
+                showErrorMessage("Failed to save setup completion. Please try again.");
+                return;
+            }
+
+            // Clear any temporary onboarding progress data
+            try {
+                prefsHelper.clearOnboardingProgress();
+            } catch (Exception e) {
+                // Non-critical, just log
+                android.util.Log.w(TAG, "Failed to clear onboarding progress", e);
+            }
+
+            // All data saved successfully, proceed to home
+            android.util.Log.d(TAG, "Onboarding completed successfully, navigating to home");
 
             // Navigate to HomeActivity
             Intent intent = new Intent(this, HomeActivity.class);
@@ -380,8 +449,13 @@ public class UsernameSetupActivity extends AppCompatActivity {
             finish();
 
         } catch (Exception e) {
-            // Handle any errors during user creation
-            showErrorMessage("Error completing setup. Please try again.");
+            // Catch any unexpected errors
+            android.util.Log.e(TAG, "Unexpected error during onboarding completion", e);
+            showErrorMessage("An unexpected error occurred. Please restart the setup process.");
+
+            // Reset to first step as a safety measure
+            onboardingData.setCurrentStep(OnboardingData.STEP_USERNAME);
+            updateUIForCurrentStep();
         }
     }
 
@@ -579,11 +653,22 @@ public class UsernameSetupActivity extends AppCompatActivity {
     }
 
     /**
-     * Restore progress if user returns
+     * ADDED: Method to verify app state on resume
      */
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Check if onboarding was somehow completed while app was paused
+        if (prefsHelper.isOnboardingCompleted() && prefsHelper.hasUser()) {
+            android.util.Log.d(TAG, "Onboarding already completed, redirecting to home");
+            Intent intent = new Intent(this, HomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         // Restore onboarding progress if it exists
         OnboardingData savedProgress = prefsHelper.getOnboardingProgress();
         if (savedProgress != null && !savedProgress.isOnboardingCompleted()) {

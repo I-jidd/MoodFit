@@ -1,7 +1,11 @@
+/**
+ * ENHANCED: Added better error handling and verification methods
+ */
 package com.example.moodfit.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.moodfit.models.MotivationalQuote;
 import com.example.moodfit.models.WorkoutSession;
@@ -18,17 +22,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Helper class for managing SharedPreferences operations
- * Handles serialization/deserialization of complex objects using Gson
- */
-/**
- * Helper class for managing SharedPreferences operations
- * Handles serialization/deserialization of complex objects using Gson
- */
 public class SharedPreferencesHelper {
-
+    private static final String TAG = "SharedPreferencesHelper";
     private static final String PREFS_NAME = "MoodFitPrefs";
+
+    // Keys
     private static final String KEY_USER_DATA = "user_data";
     private static final String KEY_ONBOARDING_COMPLETED = "onboarding_completed";
     private static final String KEY_ONBOARDING_PROGRESS = "onboarding_progress";
@@ -48,43 +46,242 @@ public class SharedPreferencesHelper {
         this.gson = new Gson();
     }
 
-    // ==================== USER DATA ====================
+    // ==================== ENHANCED USER DATA METHODS ====================
 
     /**
-     * Save user data to SharedPreferences
+     * ENHANCED: Save user data with verification
      */
-    public void saveUser(User user) {
+    public boolean saveUser(User user) {
         try {
-            if (user != null) {
-                String userJson = gson.toJson(user);
-                prefs.edit().putString(KEY_USER_DATA, userJson).apply();
+            if (user == null) {
+                Log.e(TAG, "Cannot save null user");
+                return false;
+            }
+
+            String userJson = gson.toJson(user);
+            boolean success = prefs.edit().putString(KEY_USER_DATA, userJson).commit(); // Use commit() for immediate save
+
+            if (success) {
+                Log.d(TAG, "User saved successfully: " + user.getUsername());
+
+                // Verify the save was successful
+                User verifyUser = getUser();
+                if (verifyUser != null && user.getUsername().equals(verifyUser.getUsername())) {
+                    Log.d(TAG, "User save verification successful");
+                    return true;
+                } else {
+                    Log.e(TAG, "User save verification failed");
+                    return false;
+                }
+            } else {
+                Log.e(TAG, "Failed to save user to SharedPreferences");
+                return false;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Exception while saving user", e);
+            return false;
         }
     }
 
     /**
-     * Retrieve user data from SharedPreferences
+     * ENHANCED: Retrieve user data with better error handling
      */
     public User getUser() {
         try {
             String userJson = prefs.getString(KEY_USER_DATA, null);
             if (userJson != null && !userJson.isEmpty()) {
-                return gson.fromJson(userJson, User.class);
+                User user = gson.fromJson(userJson, User.class);
+                Log.d(TAG, "User retrieved successfully: " + (user != null ? user.getUsername() : "null"));
+                return user;
+            } else {
+                Log.d(TAG, "No user data found in preferences");
             }
         } catch (JsonSyntaxException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Failed to parse user JSON", e);
+            // Clear corrupted data
+            clearUser();
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected error retrieving user", e);
         }
         return null;
     }
 
     /**
-     * Check if user data exists
+     * ENHANCED: Check if user data exists with validation
      */
     public boolean hasUser() {
-        return getUser() != null;
+        User user = getUser();
+        boolean hasValidUser = user != null && user.getUsername() != null && !user.getUsername().trim().isEmpty();
+        Log.d(TAG, "Has valid user: " + hasValidUser);
+        return hasValidUser;
     }
+
+    // ==================== ENHANCED ONBOARDING METHODS ====================
+
+    /**
+     * ENHANCED: Mark onboarding as completed with verification
+     */
+    public boolean setOnboardingCompleted(boolean completed) {
+        try {
+            boolean success = prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).commit();
+
+            if (success) {
+                Log.d(TAG, "Onboarding completion status set to: " + completed);
+
+                // Verify the save
+                boolean verified = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false);
+                if (verified == completed) {
+                    Log.d(TAG, "Onboarding completion verification successful");
+                    return true;
+                } else {
+                    Log.e(TAG, "Onboarding completion verification failed");
+                    return false;
+                }
+            } else {
+                Log.e(TAG, "Failed to save onboarding completion status");
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Exception while setting onboarding completion", e);
+            return false;
+        }
+    }
+
+    /**
+     * ENHANCED: Check if onboarding is completed with logging
+     */
+    public boolean isOnboardingCompleted() {
+        try {
+            boolean completed = prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false);
+            Log.d(TAG, "Onboarding completed status: " + completed);
+            return completed;
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking onboarding completion", e);
+            return false;
+        }
+    }
+
+    /**
+     * ENHANCED: Save onboarding progress with verification
+     */
+    public boolean saveOnboardingProgress(OnboardingData onboardingData) {
+        try {
+            if (onboardingData != null) {
+                String progressJson = gson.toJson(onboardingData);
+                boolean success = prefs.edit().putString(KEY_ONBOARDING_PROGRESS, progressJson).commit();
+
+                if (success) {
+                    Log.d(TAG, "Onboarding progress saved at step: " + onboardingData.getCurrentStep());
+                    return true;
+                } else {
+                    Log.e(TAG, "Failed to save onboarding progress");
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Exception while saving onboarding progress", e);
+        }
+        return false;
+    }
+
+    /**
+     * ENHANCED: Get saved onboarding progress with better error handling
+     */
+    public OnboardingData getOnboardingProgress() {
+        try {
+            String progressJson = prefs.getString(KEY_ONBOARDING_PROGRESS, null);
+            if (progressJson != null && !progressJson.isEmpty()) {
+                OnboardingData progress = gson.fromJson(progressJson, OnboardingData.class);
+                Log.d(TAG, "Onboarding progress retrieved: step " + (progress != null ? progress.getCurrentStep() : "null"));
+                return progress;
+            } else {
+                Log.d(TAG, "No onboarding progress found");
+            }
+        } catch (JsonSyntaxException e) {
+            Log.e(TAG, "Failed to parse onboarding progress JSON", e);
+            clearOnboardingProgress();
+        } catch (Exception e) {
+            Log.e(TAG, "Unexpected error retrieving onboarding progress", e);
+        }
+        return null;
+    }
+
+    /**
+     * ENHANCED: Clear onboarding progress with verification
+     */
+    public boolean clearOnboardingProgress() {
+        try {
+            boolean success = prefs.edit().remove(KEY_ONBOARDING_PROGRESS).commit();
+            Log.d(TAG, "Onboarding progress cleared: " + success);
+            return success;
+        } catch (Exception e) {
+            Log.e(TAG, "Error clearing onboarding progress", e);
+            return false;
+        }
+    }
+
+    // ==================== DIAGNOSTIC METHODS ====================
+
+    /**
+     * NEW: Comprehensive diagnostic method for debugging
+     */
+    public void logDiagnosticInfo() {
+        Log.d(TAG, "=== DIAGNOSTIC INFO ===");
+        Log.d(TAG, "Has user: " + hasUser());
+        Log.d(TAG, "Onboarding completed: " + isOnboardingCompleted());
+        Log.d(TAG, "First launch: " + isFirstLaunch());
+
+        User user = getUser();
+        if (user != null) {
+            Log.d(TAG, "User ID: " + user.getUserId());
+            Log.d(TAG, "Username: " + user.getUsername());
+            Log.d(TAG, "Is first time user: " + user.isFirstTimeUser());
+        } else {
+            Log.d(TAG, "No user found");
+        }
+
+        OnboardingData progress = getOnboardingProgress();
+        if (progress != null) {
+            Log.d(TAG, "Onboarding progress exists - Step: " + progress.getCurrentStep());
+            Log.d(TAG, "Progress completed: " + progress.isOnboardingCompleted());
+        } else {
+            Log.d(TAG, "No onboarding progress found");
+        }
+        Log.d(TAG, "=====================");
+    }
+
+    /**
+     * NEW: Verify app state is consistent
+     */
+    public boolean verifyAppState() {
+        boolean hasUser = hasUser();
+        boolean onboardingCompleted = isOnboardingCompleted();
+
+        Log.d(TAG, "App state verification - Has user: " + hasUser + ", Onboarding completed: " + onboardingCompleted);
+
+        // Both should be true or both should be false for a consistent state
+        boolean isConsistent = hasUser == onboardingCompleted;
+
+        if (!isConsistent) {
+            Log.w(TAG, "INCONSISTENT APP STATE DETECTED!");
+            Log.w(TAG, "Has user: " + hasUser + ", Onboarding completed: " + onboardingCompleted);
+
+            // Attempt to fix inconsistent state
+            if (hasUser && !onboardingCompleted) {
+                Log.w(TAG, "User exists but onboarding not marked complete - fixing...");
+                setOnboardingCompleted(true);
+                isConsistent = true;
+            } else if (!hasUser && onboardingCompleted) {
+                Log.w(TAG, "Onboarding marked complete but no user - resetting...");
+                setOnboardingCompleted(false);
+                isConsistent = true;
+            }
+        }
+
+        return isConsistent;
+    }
+
+    // ==================== EXISTING METHODS (unchanged) ====================
 
     /**
      * Update specific user fields without replacing entire object
@@ -109,58 +306,6 @@ public class SharedPreferencesHelper {
      */
     public void clearUser() {
         prefs.edit().remove(KEY_USER_DATA).apply();
-    }
-
-    // ==================== ONBOARDING ====================
-
-    /**
-     * Mark onboarding as completed
-     */
-    public void setOnboardingCompleted(boolean completed) {
-        prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply();
-    }
-
-    /**
-     * Check if onboarding is completed
-     */
-    public boolean isOnboardingCompleted() {
-        return prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false);
-    }
-
-    /**
-     * Save onboarding progress (for resuming if user exits)
-     */
-    public void saveOnboardingProgress(OnboardingData onboardingData) {
-        try {
-            if (onboardingData != null) {
-                String progressJson = gson.toJson(onboardingData);
-                prefs.edit().putString(KEY_ONBOARDING_PROGRESS, progressJson).apply();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Get saved onboarding progress
-     */
-    public OnboardingData getOnboardingProgress() {
-        try {
-            String progressJson = prefs.getString(KEY_ONBOARDING_PROGRESS, null);
-            if (progressJson != null && !progressJson.isEmpty()) {
-                return gson.fromJson(progressJson, OnboardingData.class);
-            }
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Clear onboarding progress (after completion)
-     */
-    public void clearOnboardingProgress() {
-        prefs.edit().remove(KEY_ONBOARDING_PROGRESS).apply();
     }
 
     // ==================== APP SETTINGS ====================

@@ -1,3 +1,6 @@
+/**
+ * ENHANCED: Added comprehensive debugging and state verification
+ */
 package com.example.moodfit.activities;
 
 import android.content.Intent;
@@ -18,10 +21,6 @@ import com.example.moodfit.models.User;
 import com.example.moodfit.utils.DataManager;
 import com.example.moodfit.utils.SharedPreferencesHelper;
 
-/**
- * SplashActivity - App entry point and initialization
- * Handles routing between onboarding and main app based on user state
- */
 public class SplashActivity extends AppCompatActivity {
 
     // Constants
@@ -64,6 +63,14 @@ public class SplashActivity extends AppCompatActivity {
 
         // Initialize app and determine navigation
         initializeApp();
+
+        android.util.Log.d("DEBUG_STATE", "=== CURRENT APP STATE ===");
+        android.util.Log.d("DEBUG_STATE", "Onboarding completed: " + prefsHelper.isOnboardingCompleted());
+        android.util.Log.d("DEBUG_STATE", "Has user: " + prefsHelper.hasUser());
+        User debugUser = prefsHelper.getUser();
+        if (debugUser != null) {
+            android.util.Log.d("DEBUG_STATE", "User: " + debugUser.getUsername());
+        }
     }
 
     /**
@@ -191,19 +198,31 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-     * Initialize app and determine navigation path
+     * ENHANCED: Initialize app and determine navigation path with comprehensive debugging
      */
     private void initializeApp() {
         // Run initialization in background
         new Thread(() -> {
             try {
+                android.util.Log.d(TAG, "Starting app initialization");
+
                 // Initialize app (sets up default settings, etc.)
                 dataManager.initializeApp();
+
+                // ENHANCED: Comprehensive state verification
+                android.util.Log.d(TAG, "=== APP STATE VERIFICATION ===");
+
+                // Log diagnostic information
+                prefsHelper.logDiagnosticInfo();
+
+                // Verify app state consistency
+                boolean stateConsistent = prefsHelper.verifyAppState();
+                android.util.Log.d(TAG, "App state consistent: " + stateConsistent);
 
                 // Simulate some loading time for better UX
                 Thread.sleep(2300);
 
-                // Determine navigation destination
+                // Determine navigation destination with enhanced logic
                 final Intent targetIntent = determineNavigationDestination();
 
                 // Ensure minimum splash time has passed
@@ -219,6 +238,7 @@ public class SplashActivity extends AppCompatActivity {
 
             } catch (Exception e) {
                 // Handle any initialization errors
+                android.util.Log.e(TAG, "Error during app initialization", e);
                 handler.post(() -> {
                     if (!isFinishing()) {
                         handleInitializationError(e);
@@ -229,19 +249,45 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-     * Determine where to navigate based on app state
+     * ENHANCED: Determine where to navigate based on app state with detailed logging
      */
     private Intent determineNavigationDestination() {
+        android.util.Log.d(TAG, "Determining navigation destination...");
+
         // Check if onboarding is completed
         boolean onboardingCompleted = prefsHelper.isOnboardingCompleted();
         boolean hasUser = prefsHelper.hasUser();
 
+        android.util.Log.d(TAG, "Onboarding completed: " + onboardingCompleted);
+        android.util.Log.d(TAG, "Has user: " + hasUser);
+
+        // ENHANCED: Additional validation
+        if (hasUser) {
+            User user = prefsHelper.getUser();
+            if (user != null) {
+                android.util.Log.d(TAG, "User details - ID: " + user.getUserId() +
+                        ", Username: " + user.getUsername() +
+                        ", First time: " + user.isFirstTimeUser());
+            }
+        }
+
         if (onboardingCompleted && hasUser) {
             // User has completed setup - go to home
+            android.util.Log.d(TAG, "Navigation decision: HOME (setup complete)");
             updateLoadingText("Welcome back!");
             return new Intent(this, HomeActivity.class);
         } else {
             // New user or incomplete setup - go to onboarding
+            android.util.Log.d(TAG, "Navigation decision: ONBOARDING (setup incomplete)");
+
+            if (!onboardingCompleted && !hasUser) {
+                android.util.Log.d(TAG, "Reason: Fresh install - no user, no onboarding");
+            } else if (!onboardingCompleted && hasUser) {
+                android.util.Log.w(TAG, "Reason: User exists but onboarding not complete (inconsistent state)");
+            } else if (onboardingCompleted && !hasUser) {
+                android.util.Log.w(TAG, "Reason: Onboarding complete but no user (inconsistent state)");
+            }
+
             updateLoadingText("Setting up your experience...");
             return new Intent(this, UsernameSetupActivity.class);
         }
@@ -251,6 +297,8 @@ public class SplashActivity extends AppCompatActivity {
      * Navigate to the determined destination
      */
     private void navigateToDestination(Intent intent) {
+        android.util.Log.d(TAG, "Navigating to: " + intent.getComponent().getClassName());
+
         // Add transition flags
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -263,11 +311,22 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-     * Handle initialization errors gracefully
+     * ENHANCED: Handle initialization errors gracefully with state reset
      */
     private void handleInitializationError(Exception e) {
         // Log error (in production, send to crash reporting)
         android.util.Log.e(TAG, "Initialization error", e);
+
+        // Check if this might be a data corruption issue
+        try {
+            boolean hasCorruptedData = checkForDataCorruption();
+            if (hasCorruptedData) {
+                android.util.Log.w(TAG, "Data corruption detected, clearing corrupted data");
+                clearCorruptedData();
+            }
+        } catch (Exception clearError) {
+            android.util.Log.e(TAG, "Failed to clear corrupted data", clearError);
+        }
 
         // Show error message briefly, then proceed to onboarding
         updateLoadingText("Something went wrong, setting up...");
@@ -276,6 +335,55 @@ public class SplashActivity extends AppCompatActivity {
             Intent fallbackIntent = new Intent(this, UsernameSetupActivity.class);
             navigateToDestination(fallbackIntent);
         }, 1000);
+    }
+
+    /**
+     * NEW: Check for potential data corruption
+     */
+    private boolean checkForDataCorruption() {
+        try {
+            // Try to access key data and see if it's valid
+            boolean onboardingCompleted = prefsHelper.isOnboardingCompleted();
+            User user = prefsHelper.getUser();
+
+            // Check for inconsistent states that might indicate corruption
+            if (onboardingCompleted && (user == null || user.getUsername() == null)) {
+                android.util.Log.w(TAG, "Detected corrupted state: onboarding complete but invalid user");
+                return true;
+            }
+
+            if (user != null && (user.getUserId() == null || user.getUsername() == null)) {
+                android.util.Log.w(TAG, "Detected corrupted user data");
+                return true;
+            }
+
+            return false;
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error checking for data corruption", e);
+            return true; // Assume corruption if we can't even check
+        }
+    }
+
+    /**
+     * NEW: Clear corrupted data to allow fresh start
+     */
+    private void clearCorruptedData() {
+        try {
+            android.util.Log.w(TAG, "Clearing potentially corrupted data");
+
+            // Clear user data
+            prefsHelper.clearUser();
+
+            // Reset onboarding state
+            prefsHelper.setOnboardingCompleted(false);
+
+            // Clear any onboarding progress
+            prefsHelper.clearOnboardingProgress();
+
+            android.util.Log.d(TAG, "Corrupted data cleared successfully");
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Failed to clear corrupted data", e);
+        }
     }
 
     /**
