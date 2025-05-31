@@ -21,6 +21,7 @@ import com.example.moodfit.models.enums.WorkoutCategory;
 import com.example.moodfit.utils.DataManager;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -52,6 +53,11 @@ public class RandomExerciseActivity extends AppCompatActivity {
     // Animation Handler
     private Handler animationHandler;
 
+    private List<String> recentExerciseNames = new ArrayList<>();
+    private static final int MAX_RECENT_EXERCISES = 10; // Track last 10 exercises
+    private WorkoutCategory lastSelectedCategory = null;
+    private long lastSelectionTime = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,12 +72,51 @@ public class RandomExerciseActivity extends AppCompatActivity {
         // Build exercise database
         buildExerciseDatabase();
 
+        // Load selection history for smart selection
+        loadSelectionHistoryFromPrefs();
+
         // Setup event listeners
         setupEventListeners();
 
         // Initialize random generator
         random = new Random();
         animationHandler = new Handler(Looper.getMainLooper());
+    }
+
+    /**
+     * Context data class for smart selection
+     */
+    private static class SmartSelectionContext {
+        int hourOfDay;
+        int dayOfWeek;
+        boolean isWeekend;
+        boolean isEvening;
+        boolean isMorning;
+        DifficultyLevel userDifficulty;
+        long timeSinceLastSelection;
+        boolean needsCategoryVariety;
+        List<String> recentExerciseNames;
+        boolean isFirstSelectionToday;
+        boolean isQuickSession;
+
+        @Override
+        public String toString() {
+            return String.format("Context{hour=%d, weekend=%b, difficulty=%s, needsVariety=%b, recentCount=%d}",
+                    hourOfDay, isWeekend, userDifficulty, needsCategoryVariety, recentExerciseNames.size());
+        }
+    }
+
+    /**
+     * Weighted exercise wrapper for smart selection
+     */
+    private static class WeightedExercise {
+        Exercise exercise;
+        double weight;
+
+        WeightedExercise(Exercise exercise, double weight) {
+            this.exercise = exercise;
+            this.weight = weight;
+        }
     }
 
     /**
@@ -758,7 +803,7 @@ public class RandomExerciseActivity extends AppCompatActivity {
     }
 
     /**
-     * Generate and display a random exercise
+     * ENHANCED: Generate and display exercise with better context messaging
      */
     private void generateRandomExercise() {
         if (isGenerating) return;
@@ -775,7 +820,7 @@ public class RandomExerciseActivity extends AppCompatActivity {
         // Generate exercise after animation delay
         animationHandler.postDelayed(() -> {
             currentExercise = selectRandomExercise();
-            displayExercise(currentExercise);
+            displayExerciseWithContext(currentExercise);
             showTryAgainButton();
             isGenerating = false;
 
@@ -784,6 +829,92 @@ public class RandomExerciseActivity extends AppCompatActivity {
             btnTryAgain.setEnabled(true);
 
         }, 1500); // 1.5 second animation
+    }
+
+    /**
+     * ENHANCED: Display exercise with contextual messaging
+     */
+    private void displayExerciseWithContext(Exercise exercise) {
+        // Generate contextual intro message
+        String contextMessage = generateContextualIntro();
+
+        // Format exercise information with context
+        String displayText = contextMessage + "\n\n" +
+                "🏃‍♂️ " + exercise.getName() + "\n\n" +
+                "📝 " + exercise.getDescription() + "\n\n" +
+                "⏱️ Duration: " + exercise.getEstimatedDurationMinutes() + " minutes\n" +
+                "🔥 Calories: ~" + exercise.getEstimatedCalories() + "\n" +
+                "💪 Level: " + exercise.getDifficulty().getDisplayName() + "\n" +
+                "📂 Category: " + exercise.getCategory().getDisplayName() + "\n\n" +
+                "🎯 Instructions:\n" + exercise.getInstructions();
+
+        // Animate text appearance
+        tvRandomExercise.setAlpha(0f);
+        tvRandomExercise.setText(displayText);
+        tvRandomExercise.animate()
+                .alpha(1f)
+                .scaleX(1.05f)
+                .scaleY(1.05f)
+                .setDuration(500)
+                .withEndAction(() -> {
+                    tvRandomExercise.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(200)
+                            .start();
+                })
+                .start();
+
+        // Add haptic feedback
+        performHapticFeedback();
+    }
+
+    /**
+     * Generate contextual intro message based on selection factors
+     */
+    private String generateContextualIntro() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        boolean isWeekend = (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY);
+
+        List<String> intros = new ArrayList<>();
+
+        // Time-based messages
+        if (hour < 10) {
+            intros.add("🌅 Perfect morning energizer!");
+            intros.add("☀️ Great way to start your day!");
+            intros.add("🌞 Morning motivation incoming!");
+        } else if (hour > 18) {
+            intros.add("🌙 Evening energy booster!");
+            intros.add("✨ Perfect end-of-day movement!");
+            intros.add("🌆 Time to unwind with movement!");
+        } else {
+            intros.add("⚡ Midday power-up time!");
+            intros.add("🚀 Energy boost activated!");
+            intros.add("💫 Perfect timing for movement!");
+        }
+
+        // Weekend vs weekday
+        if (isWeekend) {
+            intros.add("🎉 Weekend workout surprise!");
+            intros.add("🏖️ Weekend vibes exercise!");
+        } else {
+            intros.add("💼 Weekday wellness break!");
+            intros.add("📅 Midweek motivation!");
+        }
+
+        // Variety messages
+        if (recentExerciseNames.size() > 3) {
+            intros.add("🎲 Mixing things up for you!");
+            intros.add("🔄 Keeping it fresh and varied!");
+        } else {
+            intros.add("🎯 Handpicked just for you!");
+            intros.add("✨ Your personalized challenge!");
+        }
+
+        // Random selection
+        return intros.get(random.nextInt(intros.size()));
     }
 
     /**
@@ -853,24 +984,401 @@ public class RandomExerciseActivity extends AppCompatActivity {
     }
 
     /**
-     * Select a random exercise based on user's difficulty preference
+     * ENHANCED: Select a random exercise with intelligent variety and preferences
      */
     private Exercise selectRandomExercise() {
         if (exerciseDatabase.isEmpty()) {
-            // Fallback exercise
-            return new Exercise("Jumping Jacks", "Classic cardio exercise",
-                    DifficultyLevel.BEGINNER, WorkoutCategory.CARDIO);
+            return createFallbackExercise();
         }
 
-        // Get user's preferred difficulty
-        DifficultyLevel userDifficulty = currentUser != null ?
+        // Get context for smart selection
+        SmartSelectionContext context = analyzeSelectionContext();
+
+        // Create weighted exercise pool based on multiple factors
+        List<WeightedExercise> weightedExercises = createWeightedExercisePool(context);
+
+        // Select exercise using weighted random selection
+        Exercise selectedExercise = selectWeightedRandomExercise(weightedExercises);
+
+        // Update tracking for future selections
+        updateSelectionHistory(selectedExercise);
+
+        android.util.Log.d(TAG, "Smart selection: " + selectedExercise.getName() +
+                " (Category: " + selectedExercise.getCategory().getDisplayName() +
+                ", Difficulty: " + selectedExercise.getDifficulty().getDisplayName() + ")");
+
+        return selectedExercise;
+    }
+
+    /**
+     * Analyze current context for smart exercise selection
+     */
+    private SmartSelectionContext analyzeSelectionContext() {
+        SmartSelectionContext context = new SmartSelectionContext();
+
+        // Time-based factors
+        Calendar calendar = Calendar.getInstance();
+        context.hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+        context.dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        context.isWeekend = (context.dayOfWeek == Calendar.SATURDAY || context.dayOfWeek == Calendar.SUNDAY);
+        context.isEvening = context.hourOfDay >= 18;
+        context.isMorning = context.hourOfDay <= 10;
+
+        // User preference factors
+        context.userDifficulty = currentUser != null ?
                 currentUser.getPreferredDifficulty() : DifficultyLevel.BEGINNER;
 
-        // Filter exercises by difficulty (include current level and one level below/above)
-        List<Exercise> suitableExercises = filterExercisesByDifficulty(userDifficulty);
+        // Variety factors
+        context.timeSinceLastSelection = System.currentTimeMillis() - lastSelectionTime;
+        context.needsCategoryVariety = shouldVariateCategory();
+        context.recentExerciseNames = new ArrayList<>(recentExerciseNames);
 
-        // Select random exercise from suitable list
-        return suitableExercises.get(random.nextInt(suitableExercises.size()));
+        // Special occasion factors
+        context.isFirstSelectionToday = recentExerciseNames.isEmpty();
+        context.isQuickSession = context.timeSinceLastSelection < 300000; // Less than 5 minutes
+
+        android.util.Log.d(TAG, "Selection context: " + context.toString());
+        return context;
+    }
+
+    /**
+     * Check if we should vary the exercise category
+     */
+    private boolean shouldVariateCategory() {
+        // Vary category if we've had the same category multiple times recently
+        if (lastSelectedCategory == null) return false;
+
+        int sameCategories = 0;
+        for (String exerciseName : recentExerciseNames) {
+            // Find exercise in database to check category
+            for (Exercise exercise : exerciseDatabase) {
+                if (exercise.getName().equals(exerciseName)) {
+                    if (exercise.getCategory() == lastSelectedCategory) {
+                        sameCategories++;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return sameCategories >= 2; // Vary if last 2+ were same category
+    }
+
+    /**
+     * Create weighted exercise pool based on context and preferences
+     */
+    private List<WeightedExercise> createWeightedExercisePool(SmartSelectionContext context) {
+        List<WeightedExercise> weightedPool = new ArrayList<>();
+
+        for (Exercise exercise : exerciseDatabase) {
+            double weight = calculateExerciseWeight(exercise, context);
+            if (weight > 0) {
+                weightedPool.add(new WeightedExercise(exercise, weight));
+            }
+        }
+
+        // Sort by weight for debugging
+        weightedPool.sort((a, b) -> Double.compare(b.weight, a.weight));
+
+        android.util.Log.d(TAG, "Created weighted pool with " + weightedPool.size() + " exercises");
+        if (!weightedPool.isEmpty()) {
+            android.util.Log.d(TAG, "Top weighted exercise: " + weightedPool.get(0).exercise.getName() +
+                    " (weight: " + String.format("%.2f", weightedPool.get(0).weight) + ")");
+        }
+
+        return weightedPool;
+    }
+
+    /**
+     * Calculate weight for an exercise based on multiple factors
+     */
+    private double calculateExerciseWeight(Exercise exercise, SmartSelectionContext context) {
+        double weight = 1.0; // Base weight
+
+        // 1. DIFFICULTY MATCHING (Most Important Factor)
+        weight *= calculateDifficultyWeight(exercise.getDifficulty(), context);
+
+        // 2. RECENT EXERCISE PENALTY (Avoid Repetition)
+        if (context.recentExerciseNames.contains(exercise.getName())) {
+            int recentIndex = context.recentExerciseNames.indexOf(exercise.getName());
+            double penalty = 1.0 - (0.8 - (recentIndex * 0.1)); // Recent = lower weight
+            weight *= Math.max(penalty, 0.1); // Minimum 10% weight
+        }
+
+        // 3. CATEGORY VARIETY BONUS
+        weight *= calculateCategoryWeight(exercise.getCategory(), context);
+
+        // 4. TIME-OF-DAY PREFERENCES
+        weight *= calculateTimeBasedWeight(exercise, context);
+
+        // 5. SPECIAL CONTEXT BONUSES
+        weight *= calculateSpecialContextWeight(exercise, context);
+
+        // 6. FUN FACTOR BONUS (New category gets boost)
+        if (exercise.getCategory() == WorkoutCategory.CARDIO &&
+                (exercise.getName().contains("Dance") || exercise.getName().contains("Animal") ||
+                        exercise.getName().contains("Superhero") || exercise.getName().contains("Ninja"))) {
+            weight *= 1.3; // 30% bonus for fun exercises
+        }
+
+        // 7. DURATION APPROPRIATENESS
+        weight *= calculateDurationWeight(exercise, context);
+
+        return Math.max(weight, 0.05); // Minimum weight to ensure variety
+    }
+
+    /**
+     * Calculate difficulty-based weight
+     */
+    private double calculateDifficultyWeight(DifficultyLevel exerciseDifficulty, SmartSelectionContext context) {
+        DifficultyLevel userDifficulty = context.userDifficulty;
+
+        if (exerciseDifficulty == userDifficulty) {
+            return 1.0; // Perfect match
+        } else if (isOneLevelEasier(exerciseDifficulty, userDifficulty)) {
+            return 0.4; // Sometimes easier for variety/recovery
+        } else if (isOneLevelHarder(exerciseDifficulty, userDifficulty)) {
+            return context.isWeekend ? 0.6 : 0.3; // More challenge on weekends
+        } else {
+            return 0.1; // Two levels apart - rare but possible
+        }
+    }
+
+    /**
+     * Calculate category-based weight for variety
+     */
+    private double calculateCategoryWeight(WorkoutCategory category, SmartSelectionContext context) {
+        double weight = 1.0;
+
+        // Boost different categories if we need variety
+        if (context.needsCategoryVariety && category != lastSelectedCategory) {
+            weight *= 1.5; // 50% bonus for different category
+        }
+
+        // Slight penalty for same category to encourage variety
+        if (category == lastSelectedCategory) {
+            weight *= 0.8;
+        }
+
+        return weight;
+    }
+    /**
+     * Calculate time-based weight preferences
+     */
+    private double calculateTimeBasedWeight(Exercise exercise, SmartSelectionContext context) {
+        double weight = 1.0;
+        WorkoutCategory category = exercise.getCategory();
+
+        // Morning preferences (6 AM - 10 AM)
+        if (context.isMorning) {
+            if (category == WorkoutCategory.YOGA || category == WorkoutCategory.BREATHING) {
+                weight *= 1.4; // Great for morning routine
+            } else if (category == WorkoutCategory.CARDIO) {
+                weight *= 1.2; // Good morning energy
+            } else if (category == WorkoutCategory.HIIT) {
+                weight *= 0.7; // Maybe too intense for morning
+            }
+        }
+
+        // Evening preferences (6 PM - 10 PM)
+        else if (context.isEvening) {
+            if (category == WorkoutCategory.BREATHING || category == WorkoutCategory.YOGA) {
+                weight *= 1.3; // Relaxing for evening
+            } else if (category == WorkoutCategory.FLEXIBILITY) {
+                weight *= 1.2; // Good for unwinding
+            } else if (category == WorkoutCategory.HIIT && context.hourOfDay > 20) {
+                weight *= 0.6; // Too stimulating late evening
+            }
+        }
+
+        // Weekend preferences
+        if (context.isWeekend) {
+            if (exercise.getName().contains("Dance") || exercise.getName().contains("Fun") ||
+                    exercise.getName().contains("Creative") || exercise.getName().contains("Animal")) {
+                weight *= 1.3; // More fun stuff on weekends
+            }
+            if (exercise.getEstimatedDurationMinutes() > 15) {
+                weight *= 1.2; // More time for longer exercises
+            }
+        }
+
+        return weight;
+    }
+
+    /**
+     * Calculate special context-based weights
+     */
+    private double calculateSpecialContextWeight(Exercise exercise, SmartSelectionContext context) {
+        double weight = 1.0;
+
+        // First selection of the day - prefer gentler start
+        if (context.isFirstSelectionToday) {
+            if (exercise.getDifficulty() == DifficultyLevel.BEGINNER) {
+                weight *= 1.2;
+            } else if (exercise.getDifficulty() == DifficultyLevel.ADVANCED) {
+                weight *= 0.8;
+            }
+        }
+
+        // Quick session - prefer shorter exercises
+        if (context.isQuickSession) {
+            if (exercise.getEstimatedDurationMinutes() <= 8) {
+                weight *= 1.3;
+            } else if (exercise.getEstimatedDurationMinutes() > 15) {
+                weight *= 0.7;
+            }
+        }
+
+        // Encourage breathing exercises during stressful times (Monday, late evening)
+        if ((context.dayOfWeek == Calendar.MONDAY || context.hourOfDay > 21) &&
+                exercise.getCategory() == WorkoutCategory.BREATHING) {
+            weight *= 1.4;
+        }
+
+        return weight;
+    }
+
+    /**
+     * Calculate duration appropriateness weight
+     */
+    private double calculateDurationWeight(Exercise exercise, SmartSelectionContext context) {
+        int duration = exercise.getEstimatedDurationMinutes();
+
+        // Prefer moderate durations most of the time
+        if (duration >= 5 && duration <= 12) {
+            return 1.2; // Sweet spot for random exercises
+        } else if (duration <= 4) {
+            return 0.9; // Too short might not be satisfying
+        } else if (duration > 20) {
+            return context.isWeekend ? 1.0 : 0.7; // Long exercises better for weekends
+        }
+
+        return 1.0;
+    }
+
+    /**
+     * Select exercise using weighted random selection
+     */
+    private Exercise selectWeightedRandomExercise(List<WeightedExercise> weightedPool) {
+        if (weightedPool.isEmpty()) {
+            return createFallbackExercise();
+        }
+
+        // Calculate total weight
+        double totalWeight = 0;
+        for (WeightedExercise weighted : weightedPool) {
+            totalWeight += weighted.weight;
+        }
+
+        // Select random point in weight range
+        double randomPoint = random.nextDouble() * totalWeight;
+
+        // Find exercise at that point
+        double currentWeight = 0;
+        for (WeightedExercise weighted : weightedPool) {
+            currentWeight += weighted.weight;
+            if (currentWeight >= randomPoint) {
+                return weighted.exercise;
+            }
+        }
+
+        // Fallback to first exercise
+        return weightedPool.get(0).exercise;
+    }
+
+    /**
+     * Update selection history for future smart selections
+     */
+    private void updateSelectionHistory(Exercise selectedExercise) {
+        // Add to recent exercises list
+        recentExerciseNames.add(0, selectedExercise.getName()); // Add to front
+
+        // Keep only recent exercises
+        while (recentExerciseNames.size() > MAX_RECENT_EXERCISES) {
+            recentExerciseNames.remove(recentExerciseNames.size() - 1);
+        }
+
+        // Update category tracking
+        lastSelectedCategory = selectedExercise.getCategory();
+        lastSelectionTime = System.currentTimeMillis();
+
+        // Save to preferences for persistence (optional)
+        saveSelectionHistoryToPrefs();
+    }
+
+    /**
+     * Save selection history to shared preferences for persistence
+     */
+    private void saveSelectionHistoryToPrefs() {
+        try {
+            android.content.SharedPreferences prefs = getSharedPreferences("random_exercise_prefs", MODE_PRIVATE);
+            android.content.SharedPreferences.Editor editor = prefs.edit();
+
+            // Save recent exercise names as comma-separated string
+            String recentExercisesString = android.text.TextUtils.join(",", recentExerciseNames);
+            editor.putString("recent_exercises", recentExercisesString);
+
+            // Save last category and time
+            if (lastSelectedCategory != null) {
+                editor.putString("last_category", lastSelectedCategory.name());
+            }
+            editor.putLong("last_selection_time", lastSelectionTime);
+
+            editor.apply();
+        } catch (Exception e) {
+            android.util.Log.w(TAG, "Could not save selection history", e);
+        }
+    }
+
+    /**
+     * Load selection history from shared preferences
+     */
+    private void loadSelectionHistoryFromPrefs() {
+        try {
+            android.content.SharedPreferences prefs = getSharedPreferences("random_exercise_prefs", MODE_PRIVATE);
+
+            // Load recent exercises
+            String recentExercisesString = prefs.getString("recent_exercises", "");
+            if (!recentExercisesString.isEmpty()) {
+                String[] exercises = recentExercisesString.split(",");
+                recentExerciseNames.clear();
+                for (String exercise : exercises) {
+                    if (!exercise.trim().isEmpty()) {
+                        recentExerciseNames.add(exercise.trim());
+                    }
+                }
+            }
+
+            // Load last category
+            String lastCategoryString = prefs.getString("last_category", "");
+            if (!lastCategoryString.isEmpty()) {
+                try {
+                    lastSelectedCategory = WorkoutCategory.valueOf(lastCategoryString);
+                } catch (IllegalArgumentException e) {
+                    lastSelectedCategory = null;
+                }
+            }
+
+            // Load last selection time
+            lastSelectionTime = prefs.getLong("last_selection_time", 0);
+
+            android.util.Log.d(TAG, "Loaded selection history: " + recentExerciseNames.size() + " recent exercises");
+
+        } catch (Exception e) {
+            android.util.Log.w(TAG, "Could not load selection history", e);
+        }
+    }
+
+    /**
+     * Create fallback exercise for error cases
+     */
+    private Exercise createFallbackExercise() {
+        Exercise fallback = new Exercise("Jumping Jacks", "Classic full-body cardio exercise",
+                DifficultyLevel.BEGINNER, WorkoutCategory.CARDIO);
+        fallback.setEstimatedDurationMinutes(5);
+        fallback.setEstimatedCalories(50);
+        fallback.setInstructions("Jump feet apart while raising arms overhead. Do for 30 seconds, rest 10 seconds, repeat 5 times.");
+        return fallback;
     }
 
     /**
