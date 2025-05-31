@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * TutorialsActivity - Exercise library showing all exercises categorized by difficulty
  * Provides educational content and exercise demonstrations
+ * UPDATED: Fixed GIF mapping issues and enhanced debugging
  */
 public class TutorialsActivity extends AppCompatActivity {
 
@@ -54,6 +55,9 @@ public class TutorialsActivity extends AppCompatActivity {
     // Exercise Database
     private Map<DifficultyLevel, List<Exercise>> exercisesByDifficulty;
 
+    // ADDED: GIF mapping system
+    private Map<String, String> exerciseGifMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +77,9 @@ public class TutorialsActivity extends AppCompatActivity {
 
         // Setup initial state
         updateSectionVisibility();
+
+        // DEBUG: Enable this to debug GIF mapping issues (disable in production)
+        debugGifMappingIssues();
     }
 
     /**
@@ -94,10 +101,13 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Build comprehensive exercise database
+     * Build comprehensive exercise database with proper GIF mapping
      */
     private void buildExerciseDatabase() {
         exercisesByDifficulty = new HashMap<>();
+
+        // Initialize gif mapping first
+        initializeExerciseGifMapping();
 
         // Initialize lists for each difficulty
         exercisesByDifficulty.put(DifficultyLevel.BEGINNER, new ArrayList<>());
@@ -108,6 +118,59 @@ public class TutorialsActivity extends AppCompatActivity {
         addBeginnerExercises();
         addIntermediateExercises();
         addAdvancedExercises();
+    }
+
+    /**
+     * Initialize proper mapping between exercise names and their actual GIF filenames
+     * UPDATE THIS MAP TO MATCH YOUR ACTUAL GIF FILES
+     */
+    private void initializeExerciseGifMapping() {
+        exerciseGifMap = new HashMap<>();
+
+        // BEGINNER EXERCISES - Map exact exercise names to actual GIF files
+        exerciseGifMap.put("Marching in Place", "gif_marching_in_place");
+        exerciseGifMap.put("Wall Push-Ups", "gif_wall_pushups");
+        exerciseGifMap.put("Seated Leg Lifts", "gif_seated_leg_lifts");
+        exerciseGifMap.put("Chair Squats", "gif_chair_squats");
+        exerciseGifMap.put("Wall Sits", "gif_wall_sits");
+        exerciseGifMap.put("Modified Planks", "gif_modified_planks");
+        exerciseGifMap.put("Neck Rolls", "gif_neck_rolls");
+        exerciseGifMap.put("Shoulder Shrugs", "gif_shoulder_shrugs");
+        exerciseGifMap.put("Box Breathing", "gif_box_breathing");
+        exerciseGifMap.put("Belly Breathing", "gif_belly_breathing");
+        exerciseGifMap.put("Child's Pose", "gif_childs_pose");
+        exerciseGifMap.put("Mountain Pose", "gif_mountain_pose");
+
+        // INTERMEDIATE EXERCISES
+        exerciseGifMap.put("Jumping Jacks", "gif_jumping_jacks");
+        exerciseGifMap.put("Step-Ups", "gif_stepups");
+        exerciseGifMap.put("Dancing", "gif_dancing");
+        exerciseGifMap.put("Push-Ups", "gif_pushups");
+        exerciseGifMap.put("Bodyweight Squats", "gif_bodyweight_squats");
+        exerciseGifMap.put("Lunges", "gif_lunges");
+        exerciseGifMap.put("Classic Tabata", "gif_classic_tabata");
+        exerciseGifMap.put("EMOM Challenge", "gif_emom_challenge");
+        exerciseGifMap.put("Sun Salutation A", "gif_sun_salutation_a");
+        exerciseGifMap.put("Warrior II Flow", "gif_warrior_ii_flow");
+        exerciseGifMap.put("Cat-Cow Stretches", "gif_catcow_stretches");
+        exerciseGifMap.put("Hip Flexor Stretch", "gif_hip_flexor_stretch");
+
+        // ADVANCED EXERCISES
+        exerciseGifMap.put("Burpees", "gif_burpees");
+        exerciseGifMap.put("Mountain Climbers", "gif_mountain_climbers");
+        exerciseGifMap.put("Single-Arm Push-Ups", "gif_singlearm_pushups");
+        exerciseGifMap.put("Pistol Squats", "gif_pistol_squats");
+        exerciseGifMap.put("Death by Burpees", "gif_death_by_burpees");
+        exerciseGifMap.put("Fight Gone Bad", "gif_fight_gone_bad");
+        exerciseGifMap.put("Crow Pose", "gif_crow_pose");
+        exerciseGifMap.put("Headstand", "gif_headstand");
+        exerciseGifMap.put("Full Splits", "gif_full_splits");
+        exerciseGifMap.put("Backbend Flow", "gif_backbend_flow");
+        exerciseGifMap.put("Breath of Fire", "gif_breath_of_fire");
+        exerciseGifMap.put("Wim Hof Method", "gif_wim_hof_method");
+
+        // TODO: Update these mappings to match your actual GIF file names
+        // Run the app and check the logs to see which files exist
     }
 
     /**
@@ -180,8 +243,6 @@ public class TutorialsActivity extends AppCompatActivity {
                 "Foundation of all standing poses",
                 "Stand tall, feet together, arms at sides. Focus on alignment for 1 minute",
                 DifficultyLevel.BEGINNER, WorkoutCategory.YOGA, 4, 20));
-
-        beginnerExercises.add(createExercise("Test","Test", "Test", DifficultyLevel.BEGINNER, WorkoutCategory.STRENGTH, 1, 1));
     }
 
     /**
@@ -330,7 +391,7 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Helper method to create exercise objects
+     * Helper method to create exercise objects with proper GIF mapping
      */
     private Exercise createExercise(String name, String description, String instructions,
                                     DifficultyLevel difficulty, WorkoutCategory category,
@@ -340,15 +401,33 @@ public class TutorialsActivity extends AppCompatActivity {
         exercise.setEstimatedDurationMinutes(duration);
         exercise.setEstimatedCalories(calories);
 
-        // Set GIF resource name (to be loaded from drawable folder)
-        String gifName = generateGifName(name);
-        exercise.setImageUrl(gifName); // We'll use imageUrl field to store GIF name
+        // Use the mapped GIF name, or generate one if not found
+        String gifName = getCorrectGifName(name);
+        exercise.setImageUrl(gifName);
 
         return exercise;
     }
 
     /**
-     * Generate GIF filename from exercise name
+     * Get the correct GIF name for an exercise
+     */
+    private String getCorrectGifName(String exerciseName) {
+        // First, try to get from our mapping
+        String mappedGif = exerciseGifMap.get(exerciseName);
+
+        if (mappedGif != null) {
+            android.util.Log.d("GIF_MAPPING", "✅ Found mapped GIF for '" + exerciseName + "': " + mappedGif);
+            return mappedGif;
+        } else {
+            // Fallback to generated name
+            String generatedGif = generateGifName(exerciseName);
+            android.util.Log.w("GIF_MAPPING", "⚠️ No mapping found for '" + exerciseName + "', using generated: " + generatedGif);
+            return generatedGif;
+        }
+    }
+
+    /**
+     * Generate GIF filename from exercise name (fallback method)
      */
     private String generateGifName(String exerciseName) {
         // Convert exercise name to lowercase and replace spaces with underscores
@@ -473,7 +552,7 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Create exercise card view - VERSION WITHOUT ICONS
+     * Create exercise card view - UPDATED with enhanced GIF loading
      */
     private View createExerciseCard(Exercise exercise) {
         View cardView = getLayoutInflater().inflate(R.layout.item_exercise_card, null);
@@ -484,7 +563,7 @@ public class TutorialsActivity extends AppCompatActivity {
         TextView tvExerciseDuration = cardView.findViewById(R.id.tv_exercise_duration);
         TextView tvExerciseCalories = cardView.findViewById(R.id.tv_exercise_calories);
         TextView tvExerciseCategory = cardView.findViewById(R.id.tv_exercise_category);
-        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif); // GIF view only
+        ImageView ivExerciseGif = cardView.findViewById(R.id.iv_exercise_gif);
         CardView exerciseCardContainer = cardView.findViewById(R.id.exercise_card_container);
 
         // Set exercise data with null checks
@@ -504,8 +583,7 @@ public class TutorialsActivity extends AppCompatActivity {
             tvExerciseCategory.setText(exercise.getCategory().getDisplayName());
         }
 
-        // REMOVED: No more icon logic - only GIF loading
-        // Load exercise GIF
+        // Load exercise GIF with enhanced error handling
         if (ivExerciseGif != null) {
             loadExerciseGif(ivExerciseGif, exercise);
         }
@@ -526,20 +604,20 @@ public class TutorialsActivity extends AppCompatActivity {
     }
 
     /**
-     * Load exercise GIF using Glide for animation support
+     * Enhanced GIF loading with better error handling and mapping
      */
     private void loadExerciseGif(ImageView gifView, Exercise exercise) {
-        String gifName = exercise.getImageUrl(); // GIF filename stored in imageUrl
+        String gifName = exercise.getImageUrl(); // GIF filename from mapping
 
-        // DEBUG: Log what we're looking for
+        // DEBUG: Enhanced logging
+        android.util.Log.d("GIF_DEBUG", "=== Loading GIF for Exercise ===");
         android.util.Log.d("GIF_DEBUG", "Exercise: " + exercise.getName());
-        android.util.Log.d("GIF_DEBUG", "Looking for GIF: " + gifName);
+        android.util.Log.d("GIF_DEBUG", "Expected GIF: " + gifName);
 
         if (gifName != null && !gifName.isEmpty()) {
             // Try to load GIF from drawable resources
             int gifResourceId = getResources().getIdentifier(gifName, "drawable", getPackageName());
 
-            // DEBUG: Log if resource was found
             android.util.Log.d("GIF_DEBUG", "Resource ID: " + gifResourceId + " (0 means not found)");
 
             if (gifResourceId != 0) {
@@ -555,23 +633,77 @@ public class TutorialsActivity extends AppCompatActivity {
                         .into(gifView);
 
                 gifView.setVisibility(View.VISIBLE);
-                android.util.Log.d("GIF_DEBUG", "✅ Animated GIF loaded successfully in exercise card!");
+                android.util.Log.d("GIF_DEBUG", "✅ Animated GIF loaded successfully!");
             } else {
-                // GIF doesn't exist yet, show placeholder
-                android.util.Log.d("GIF_DEBUG", "❌ GIF not found, showing placeholder");
-                showGifPlaceholder(gifView, exercise);
+                // GIF doesn't exist, try alternative approaches
+                android.util.Log.w("GIF_DEBUG", "❌ GIF not found: " + gifName);
+
+                // Try without "gif_" prefix
+                String alternativeGifName = gifName.replace("gif_", "");
+                int altResourceId = getResources().getIdentifier(alternativeGifName, "drawable", getPackageName());
+
+                if (altResourceId != 0) {
+                    android.util.Log.d("GIF_DEBUG", "✅ Found alternative GIF: " + alternativeGifName);
+                    loadGifResource(gifView, altResourceId);
+                } else {
+                    // Try common alternative names
+                    tryAlternativeGifNames(gifView, exercise.getName());
+                }
             }
         } else {
-            // No GIF name, show placeholder
             android.util.Log.d("GIF_DEBUG", "❌ No GIF name provided");
             showGifPlaceholder(gifView, exercise);
         }
     }
 
     /**
-     * Show placeholder when GIF is not available - Updated to use Glide
+     * Try alternative GIF names for common variations
      */
-    private void showGifPlaceholder(ImageView gifView, Exercise exercise) {
+    private void tryAlternativeGifNames(ImageView gifView, String exerciseName) {
+        // Common alternative naming patterns
+        String[] alternativePatterns = {
+                exerciseName.toLowerCase().replaceAll("[^a-z0-9]", ""), // Remove all special chars
+                exerciseName.toLowerCase().replaceAll("\\s+", "_"), // Simple underscore replacement
+                exerciseName.toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "_"), // Your current pattern
+                "exercise_" + exerciseName.toLowerCase().replaceAll("\\s+", "_"),
+                "demo_" + exerciseName.toLowerCase().replaceAll("\\s+", "_")
+        };
+
+        for (String pattern : alternativePatterns) {
+            int resourceId = getResources().getIdentifier(pattern, "drawable", getPackageName());
+            if (resourceId != 0) {
+                android.util.Log.d("GIF_DEBUG", "✅ Found alternative pattern: " + pattern);
+                loadGifResource(gifView, resourceId);
+                return;
+            }
+        }
+
+        // If no alternatives found, show placeholder
+        android.util.Log.w("GIF_DEBUG", "❌ No alternative GIFs found for: " + exerciseName);
+        showGifPlaceholder(gifView, exerciseName);
+    }
+
+    /**
+     * Load GIF resource with Glide
+     */
+    private void loadGifResource(ImageView gifView, int resourceId) {
+        Glide.with(this)
+                .asGif()
+                .load(resourceId)
+                .apply(new RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.default_exercise_demo)
+                        .error(R.drawable.default_exercise_demo)
+                        .centerCrop())
+                .into(gifView);
+
+        gifView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Enhanced placeholder with exercise name for debugging
+     */
+    private void showGifPlaceholder(ImageView gifView, String exerciseName) {
         // Load placeholder with Glide for consistency
         Glide.with(this)
                 .load(R.drawable.default_exercise_demo)
@@ -580,41 +712,15 @@ public class TutorialsActivity extends AppCompatActivity {
 
         gifView.setVisibility(View.VISIBLE);
         gifView.setAlpha(0.7f);
+
+        android.util.Log.i("GIF_PLACEHOLDER", "Showing placeholder for: " + exerciseName);
     }
 
     /**
-     * Set appropriate icon based on exercise category - UPDATED with null check
+     * Enhanced placeholder (overloaded method)
      */
-    private void setExerciseIcon(ImageView imageView, WorkoutCategory category) {
-        // Add null check to prevent crash
-        if (imageView == null) {
-            android.util.Log.w(TAG, "ImageView is null - cannot set exercise icon");
-            return;
-        }
-
-        switch (category) {
-            case CARDIO:
-                imageView.setImageResource(R.drawable.ic_cardio);
-                break;
-            case STRENGTH:
-                imageView.setImageResource(R.drawable.ic_strength);
-                break;
-            case FLEXIBILITY:
-                imageView.setImageResource(R.drawable.ic_flexibility);
-                break;
-            case YOGA:
-                imageView.setImageResource(R.drawable.ic_yoga);
-                break;
-            case HIIT:
-                imageView.setImageResource(R.drawable.ic_hiit);
-                break;
-            case BREATHING:
-                imageView.setImageResource(R.drawable.ic_breathing);
-                break;
-            default:
-                imageView.setImageResource(R.drawable.ic_fitness_splash);
-                break;
-        }
+    private void showGifPlaceholder(ImageView gifView, Exercise exercise) {
+        showGifPlaceholder(gifView, exercise.getName());
     }
 
     /**
@@ -651,5 +757,85 @@ public class TutorialsActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    // ===============================
+    // DEBUG METHODS (Remove in production)
+    // ===============================
+
+    /**
+     * Debug method to identify GIF mapping issues
+     * DISABLE THIS IN PRODUCTION by commenting out the call in onCreate()
+     */
+    private void debugGifMappingIssues() {
+        android.util.Log.d("GIF_DEBUG", "=== DEBUGGING GIF MAPPING ISSUES ===");
+
+        // Test the problematic exercises specifically
+        String[] problematicExercises = {
+                "Marching in Place",
+                "Modified Planks",
+                "Wall Push-Ups",
+                "Chair Squats",
+                "Jumping Jacks",
+                "Burpees"
+        };
+
+        for (String exerciseName : problematicExercises) {
+            android.util.Log.d("GIF_DEBUG", "\n--- Testing: " + exerciseName + " ---");
+
+            // 1. Check what your current mapping generates
+            String currentGifName = getCorrectGifName(exerciseName);
+            android.util.Log.d("GIF_DEBUG", "Current mapping result: " + currentGifName);
+
+            // 2. Check if that resource exists
+            int resourceId = getResources().getIdentifier(currentGifName, "drawable", getPackageName());
+            android.util.Log.d("GIF_DEBUG", "Resource exists: " + (resourceId != 0) + " (ID: " + resourceId + ")");
+
+            // 3. Try alternative names
+            String[] alternatives = {
+                    exerciseName.toLowerCase().replaceAll("\\s+", "_"),
+                    exerciseName.toLowerCase().replaceAll("[^a-z0-9]", ""),
+                    "gif_" + exerciseName.toLowerCase().replaceAll("\\s+", "_"),
+                    "exercise_" + exerciseName.toLowerCase().replaceAll("\\s+", "_"),
+                    "demo_" + exerciseName.toLowerCase().replaceAll("\\s+", "_")
+            };
+
+            android.util.Log.d("GIF_DEBUG", "Trying alternatives:");
+            for (String alt : alternatives) {
+                int altId = getResources().getIdentifier(alt, "drawable", getPackageName());
+                android.util.Log.d("GIF_DEBUG", "  " + alt + ": " + (altId != 0 ? "✅ EXISTS" : "❌ missing"));
+            }
+        }
+
+        android.util.Log.d("GIF_DEBUG", "=== END DEBUG ===");
+    }
+
+    /**
+     * Utility method to list all available GIF resources (for debugging)
+     * Uncomment the call in onCreate() to use this
+     */
+    private void listAvailableGifs() {
+        android.util.Log.d("AVAILABLE_GIFS", "=== Scanning for available GIF resources ===");
+
+        try {
+            java.lang.reflect.Field[] fields = R.drawable.class.getFields();
+
+            for (java.lang.reflect.Field field : fields) {
+                String resourceName = field.getName();
+
+                // Look for files that might be GIFs
+                if (resourceName.contains("gif") ||
+                        resourceName.contains("anim") ||
+                        resourceName.contains("exercise") ||
+                        resourceName.contains("demo") ||
+                        resourceName.contains("workout")) {
+
+                    android.util.Log.d("AVAILABLE_GIFS", "Found potential GIF: " + resourceName);
+                }
+            }
+
+        } catch (Exception e) {
+            android.util.Log.e("AVAILABLE_GIFS", "Error scanning for GIF resources", e);
+        }
     }
 }
