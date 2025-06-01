@@ -28,42 +28,80 @@
         android:gravity="center"
         android:layout_marginBottom="40dp">
 
-        <!-- Flame Icon Container with background circle for enhanced effect -->
+        <!-- Enhanced Flame Icon Container - BIGGER SIZE -->
         <FrameLayout
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_marginBottom="16dp">
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="20dp">
 
-            <!-- Background circle for glow effect -->
+            <!-- Outer glow layer for epic effects -->
+            <View
+                android:id="@+id/flame_outer_glow"
+                android:layout_width="190dp"
+                android:layout_height="190dp"
+                android:layout_gravity="center"
+                android:background="@drawable/flame_outer_glow_background"
+                android:alpha="0.0"
+                android:visibility="gone" />
+
+            <!-- Main glow background - BIGGER -->
             <View
                 android:id="@+id/flame_glow_background"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:layout_gravity="center"
                 android:background="@drawable/flame_glow_background"
                 android:alpha="0.3" />
 
-            <!-- Main flame icon -->
+            <!-- Interactive flame icon - MUCH BIGGER -->
             <ImageView
                 android:id="@+id/iv_flame_icon"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_flame"
-                android:contentDescription="Streak flame icon"
-                android:scaleType="centerInside" />
+                android:contentDescription="Streak flame icon - tap for burst effect"
+                android:scaleType="centerInside"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:onClick="onFlameIconClicked"
+                android:padding="8dp" />
+
+            <!-- Particle effect overlay -->
+            <View
+                android:id="@+id/flame_particle_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.0"
+                android:visibility="gone" />
+
+            <!-- Additional inner glow for bigger flame -->
+            <View
+                android:id="@+id/flame_inner_glow"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_gravity="center"
+                android:background="@drawable/flame_inner_glow_background"
+                android:alpha="0.2" />
 
         </FrameLayout>
 
+        <!-- Enhanced streak count with bigger text for proportion -->
         <TextView
             android:id="@+id/tv_streak_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="5 Days Streak"
-            android:textSize="32sp"
+            android:textSize="36sp"
             android:textColor="@color/accent_color"
             android:textStyle="bold"
-            android:fontFamily="@font/barlow_semibold" />
+            android:fontFamily="@font/barlow_semibold"
+            android:elevation="3dp"
+            android:shadowColor="@color/black"
+            android:shadowDx="0"
+            android:shadowDy="3"
+            android:shadowRadius="6" />
 
     </LinearLayout>
 

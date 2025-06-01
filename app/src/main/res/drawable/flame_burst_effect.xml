@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Outer burst ring -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="120dp"
+                android:startColor="#00FFFFFF"
+                android:centerColor="#40FFFFFF"
+                android:endColor="#00FFFFFF" />
+            <size
+                android:width="240dp"
+                android:height="240dp" />
+        </shape>
+    </item>
+
+    <!-- Middle burst ring -->
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="80dp"
+                android:startColor="#60FFFFFF"
+                android:centerColor="#40FF6B35"
+                android:endColor="#00FF6B35" />
+            <size
+                android:width="160dp"
+                android:height="160dp" />
+        </shape>
+    </item>
+
+    <!-- Inner burst core -->
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="60dp"
+                android:startColor="#80FFFFFF"
+                android:centerColor="#60FF6B35"
+                android:endColor="#00FF6B35" />
+            <size
+                android:width="120dp"
+                android:height="120dp" />
+        </shape>
+    </item>
+
+</layer-list>

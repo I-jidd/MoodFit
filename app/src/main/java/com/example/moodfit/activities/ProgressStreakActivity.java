@@ -13,6 +13,7 @@ import com.example.moodfit.models.User;
 import com.example.moodfit.models.UserProgress;
 import com.example.moodfit.models.WorkoutSession;
 import com.example.moodfit.utils.DataManager;
+import com.example.moodfit.animations.EnhancedFlameAnimator;
 
 import java.util.List;
 import java.util.Calendar;
@@ -40,6 +41,8 @@ public class ProgressStreakActivity extends AppCompatActivity {
     private TextView tvBestStreak;
     private CardView motivationalCard;
 
+    private EnhancedFlameAnimator flameAnimator;
+    private View flameGlowBackground;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,8 +89,23 @@ public class ProgressStreakActivity extends AppCompatActivity {
         tvWeekCount = findViewById(R.id.tv_week_count);
         tvBestStreak = findViewById(R.id.tv_best_streak);
 
+        // Get the glow background view
+        flameGlowBackground = findViewById(R.id.flame_glow_background);
+
         // Find the motivational message card
         motivationalCard = (CardView) tvMotivationalMessage.getParent().getParent();
+
+        // Initialize the enhanced flame animator
+        initializeFlameAnimator();
+    }
+
+    /**
+     * Initialize the enhanced flame animator
+     */
+    private void initializeFlameAnimator() {
+        if (ivFlameIcon != null) {
+            flameAnimator = new EnhancedFlameAnimator(this, ivFlameIcon, flameGlowBackground);
+        }
     }
 
     /**
@@ -348,329 +366,52 @@ public class ProgressStreakActivity extends AppCompatActivity {
     }
 
     /**
-     * Enhanced updateFlameIcon method with animations starting from day 1
+     * Updated updateFlameIcon method - now uses enhanced animator
      */
     private void updateFlameIcon() {
         try {
             int currentStreak = (userStats != null) ? userStats.currentStreak :
                     (currentUser != null) ? currentUser.getCurrentStreak() : 0;
 
-            // Clear any existing animations
-            stopAllFlameAnimations();
+            // Use the enhanced animator instead of manual animations
+            if (flameAnimator != null) {
+                flameAnimator.animateForStreak(currentStreak);
+            }
 
-            // Set flame icon color/intensity and animation based on streak
-            if (currentStreak == 0) {
+            android.util.Log.d(TAG, "Enhanced flame animation started for streak: " + currentStreak);
+
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error updating flame icon with enhanced animator", e);
+
+            // Fallback to basic setup if enhanced animator fails
+            if (ivFlameIcon != null) {
                 ivFlameIcon.setAlpha(0.3f);
                 ivFlameIcon.setColorFilter(getResources().getColor(R.color.text_tertiary));
-                // No animation for zero streak
-            } else if (currentStreak == 1) {
-                ivFlameIcon.setAlpha(0.7f);
-                ivFlameIcon.setColorFilter(getResources().getColor(R.color.accent_color));
-                // Start gentle glow animation for day 1
-                startFlameAnimationForStreak(currentStreak, false); // Change to true for XML animations
-            } else if (currentStreak <= 3) {
-                ivFlameIcon.setAlpha(0.8f);
-                ivFlameIcon.setColorFilter(getResources().getColor(R.color.accent_color));
-                // Subtle pulse for early streak
-                startFlameAnimationForStreak(currentStreak, false);
-            } else if (currentStreak <= 7) {
-                ivFlameIcon.setAlpha(0.9f);
-                ivFlameIcon.setColorFilter(getResources().getColor(R.color.success));
-                // Medium pulse animation
-                startFlameAnimationForStreak(currentStreak, false);
-            } else if (currentStreak <= 14) {
-                ivFlameIcon.setAlpha(1.0f);
-                ivFlameIcon.setColorFilter(Color.parseColor("#FF5722"));
-                // Strong pulse animation
-                startFlameAnimationForStreak(currentStreak, false);
-            } else {
-                ivFlameIcon.setAlpha(1.0f);
-                ivFlameIcon.setColorFilter(Color.parseColor("#FF3D00")); // Deeper orange for epic streaks
-                // Epic flame animation with multiple effects
-                startFlameAnimationForStreak(currentStreak, false);
-            }
-
-        } catch (Exception e) {
-            android.util.Log.e(TAG, "Error updating flame icon", e);
-        }
-    }
-    /**
-     * Gentle glow animation for day 1 streak
-     */
-    private void addGentleGlowAnimation() {
-        ivFlameIcon.animate()
-                .alpha(1.0f)
-                .setDuration(1500)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .alpha(0.7f)
-                            .setDuration(1500)
-                            .withEndAction(this::addGentleGlowAnimation)
-                            .start();
-                })
-                .start();
-    }
-
-    /**
-     * Subtle pulse animation for early streak (2-3 days)
-     */
-    private void addSubtlePulseAnimation() {
-        ivFlameIcon.animate()
-                .scaleX(1.05f)
-                .scaleY(1.05f)
-                .alpha(1.0f)
-                .setDuration(1200)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .alpha(0.8f)
-                            .setDuration(1200)
-                            .withEndAction(this::addSubtlePulseAnimation)
-                            .start();
-                })
-                .start();
-    }
-
-    /**
-     * Medium pulse animation for good streak (4-7 days)
-     */
-    private void addMediumPulseAnimation() {
-        ivFlameIcon.animate()
-                .scaleX(1.1f)
-                .scaleY(1.1f)
-                .alpha(1.0f)
-                .setDuration(1000)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .alpha(0.9f)
-                            .setDuration(1000)
-                            .withEndAction(this::addMediumPulseAnimation)
-                            .start();
-                })
-                .start();
-    }
-
-    /**
-     * Strong pulse animation for excellent streak (8-14 days)
-     */
-    private void addStrongPulseAnimation() {
-        ivFlameIcon.animate()
-                .scaleX(1.15f)
-                .scaleY(1.15f)
-                .alpha(1.0f)
-                .rotation(5f)
-                .setDuration(800)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .alpha(1.0f)
-                            .rotation(-5f)
-                            .setDuration(800)
-                            .withEndAction(() -> {
-                                ivFlameIcon.animate()
-                                        .rotation(0f)
-                                        .setDuration(400)
-                                        .withEndAction(this::addStrongPulseAnimation)
-                                        .start();
-                            })
-                            .start();
-                })
-                .start();
-    }
-
-    /**
-     * Epic flame animation for legendary streaks (15+ days)
-     */
-    private void addEpicFlameAnimation() {
-        // Primary pulsing animation
-        ivFlameIcon.animate()
-                .scaleX(1.2f)
-                .scaleY(1.2f)
-                .alpha(1.0f)
-                .setDuration(600)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .scaleX(0.95f)
-                            .scaleY(0.95f)
-                            .setDuration(600)
-                            .withEndAction(() -> {
-                                ivFlameIcon.animate()
-                                        .scaleX(1.0f)
-                                        .scaleY(1.0f)
-                                        .setDuration(300)
-                                        .withEndAction(this::addEpicFlameAnimation)
-                                        .start();
-                            })
-                            .start();
-                })
-                .start();
-
-        // Add subtle rotation for epic effect
-        addEpicRotationEffect();
-    }
-
-    /**
-     * Additional rotation effect for epic streaks
-     */
-    private void addEpicRotationEffect() {
-        ivFlameIcon.animate()
-                .rotation(360f)
-                .setDuration(4000)
-                .withEndAction(() -> {
-                    ivFlameIcon.setRotation(0f);
-                    // Restart rotation after a pause
-                    ivFlameIcon.postDelayed(this::addEpicRotationEffect, 2000);
-                })
-                .start();
-    }
-
-    /**
-     * Alternative method using XML animation resources
-     * Use this if you prefer to use the XML animations from res/animator/
-     */
-    private void addXmlBasedFlameAnimation(int streakLevel) {
-        try {
-            // Clear any existing animations
-            ivFlameIcon.clearAnimation();
-            if (currentFlameAnimator != null) {
-                currentFlameAnimator.cancel();
-            }
-
-            int animatorRes;
-
-            switch (streakLevel) {
-                case 1:
-                    // For day 1, use gentle glow animation
-                    animatorRes = R.animator.flame_gentle_glow;
-                    currentFlameAnimator = android.animation.AnimatorInflater.loadAnimator(this, animatorRes);
-                    currentFlameAnimator.setTarget(ivFlameIcon);
-                    currentFlameAnimator.start();
-                    break;
-
-                case 2:
-                case 3:
-                    // Use subtle pulse for early streak
-                    animatorRes = R.animator.flame_subtle_pulse;
-                    currentFlameAnimator = android.animation.AnimatorInflater.loadAnimator(this, animatorRes);
-                    currentFlameAnimator.setTarget(ivFlameIcon);
-                    currentFlameAnimator.start();
-                    break;
-
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                    // Use medium pulse for good streak
-                    animatorRes = R.animator.flame_medium_pulse;
-                    currentFlameAnimator = android.animation.AnimatorInflater.loadAnimator(this, animatorRes);
-                    currentFlameAnimator.setTarget(ivFlameIcon);
-                    currentFlameAnimator.start();
-                    break;
-
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                    // Use strong pulse for excellent streak
-                    animatorRes = R.animator.flame_strong_pulse;
-                    currentFlameAnimator = android.animation.AnimatorInflater.loadAnimator(this, animatorRes);
-                    currentFlameAnimator.setTarget(ivFlameIcon);
-                    currentFlameAnimator.start();
-                    break;
-
-                default:
-                    // For epic streaks (15+), use epic pulse plus rotation
-                    animatorRes = R.animator.flame_epic_pulse;
-                    currentFlameAnimator = android.animation.AnimatorInflater.loadAnimator(this, animatorRes);
-                    currentFlameAnimator.setTarget(ivFlameIcon);
-                    currentFlameAnimator.start();
-
-                    // Add rotation animation for epic effect
-                    android.view.animation.Animation rotationAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.flame_epic_rotation);
-                    ivFlameIcon.startAnimation(rotationAnim);
-                    break;
-            }
-
-        } catch (Exception e) {
-            android.util.Log.e(TAG, "Error adding XML-based flame animation", e);
-            // Fallback to programmatic animation
-            addGentleGlowAnimation();
-        }
-    }
-
-    /**
-     * Method to start appropriate flame animation based on streak
-     * Call this from updateFlameIcon() instead of individual animation methods
-     * Set useXmlAnimations to true if you want to use XML animations from res/animator/
-     */
-    private void startFlameAnimationForStreak(int streak, boolean useXmlAnimations) {
-        if (streak == 0) {
-            // No animation for zero streak
-            return;
-        }
-
-        if (useXmlAnimations) {
-            addXmlBasedFlameAnimation(streak);
-        } else {
-            // Use programmatic animations
-            if (streak == 1) {
-                addGentleGlowAnimation();
-            } else if (streak <= 3) {
-                addSubtlePulseAnimation();
-            } else if (streak <= 7) {
-                addMediumPulseAnimation();
-            } else if (streak <= 14) {
-                addStrongPulseAnimation();
-            } else {
-                addEpicFlameAnimation();
             }
         }
     }
-
-    // Add this field at the top of your class with other field declarations
-    private android.animation.Animator currentFlameAnimator;
 
     /**
      * Enhanced method to stop all flame animations when needed
      */
     private void stopAllFlameAnimations() {
-        if (ivFlameIcon != null) {
-            ivFlameIcon.clearAnimation();
-            ivFlameIcon.animate().cancel();
-
-            // Stop ObjectAnimator animations
-            if (currentFlameAnimator != null) {
-                currentFlameAnimator.cancel();
-                currentFlameAnimator = null;
-            }
-
-            // Reset to default state
-            ivFlameIcon.setScaleX(1.0f);
-            ivFlameIcon.setScaleY(1.0f);
-            ivFlameIcon.setRotation(0f);
-
-            // Remove any pending animation callbacks
-            ivFlameIcon.removeCallbacks(null);
+        if (flameAnimator != null) {
+            flameAnimator.stopAllAnimations();
         }
     }
 
     /**
-     * Call this in onPause() to stop animations when activity is not visible
+     * Updated onPause to handle enhanced animations
      */
     @Override
     protected void onPause() {
         super.onPause();
-        stopAllFlameAnimations();
+        if (flameAnimator != null) {
+            flameAnimator.pauseAnimations();
+        }
     }
     /**
-     * Call this in onResume() to restart animations
+     * Updated onResume to handle enhanced animations
      */
     @Override
     protected void onResume() {
@@ -686,31 +427,15 @@ public class ProgressStreakActivity extends AppCompatActivity {
 
                 // Reload and update display (this will restart animations)
                 loadProgressData();
+
+                // Resume flame animations
+                if (flameAnimator != null) {
+                    flameAnimator.resumeAnimations();
+                }
             }
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error refreshing data on resume", e);
         }
-    }
-
-
-
-    /**
-     * Add pulsing animation to flame for high streaks
-     */
-    private void addFlameAnimation() {
-        ivFlameIcon.animate()
-                .scaleX(1.1f)
-                .scaleY(1.1f)
-                .setDuration(1000)
-                .withEndAction(() -> {
-                    ivFlameIcon.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setDuration(1000)
-                            .withEndAction(this::addFlameAnimation) // Loop the animation
-                            .start();
-                })
-                .start();
     }
 
     /**
@@ -797,20 +522,73 @@ public class ProgressStreakActivity extends AppCompatActivity {
     }
 
     /**
-     * Enhanced onDestroy to properly clean up animations
+     * Updated onDestroy to properly clean up enhanced animations
      */
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        // Stop any ongoing animations
-        stopAllFlameAnimations();
+        // Cleanup enhanced animator
+        if (flameAnimator != null) {
+            flameAnimator.cleanup();
+            flameAnimator = null;
+        }
 
         // Clear DataManager caches if needed
         if (dataManager != null) {
             dataManager.clearCaches();
         }
     }
+
+    /**
+     * NEW: Method to trigger celebration animation on milestone
+     */
+    private void triggerMilestoneCelebration(int streakCount) {
+        if (flameAnimator != null) {
+            // Stop current animation
+            flameAnimator.pauseAnimations();
+
+            // Trigger special celebration sequence
+            ivFlameIcon.animate()
+                    .scaleX(2.0f)
+                    .scaleY(2.0f)
+                    .rotation(360f)
+                    .setDuration(1000)
+                    .setInterpolator(new android.view.animation.OvershootInterpolator())
+                    .withEndAction(() -> {
+                        ivFlameIcon.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .rotation(0f)
+                                .setDuration(500)
+                                .withEndAction(() -> {
+                                    // Resume normal animation after celebration
+                                    flameAnimator.animateForStreak(streakCount);
+                                })
+                                .start();
+                    })
+                    .start();
+
+            // Add glow explosion if available
+            if (flameGlowBackground != null) {
+                flameGlowBackground.animate()
+                        .scaleX(3.0f)
+                        .scaleY(3.0f)
+                        .alpha(1.0f)
+                        .setDuration(1000)
+                        .withEndAction(() -> {
+                            flameGlowBackground.animate()
+                                    .scaleX(1.0f)
+                                    .scaleY(1.0f)
+                                    .alpha(0.5f)
+                                    .setDuration(500)
+                                    .start();
+                        })
+                        .start();
+            }
+        }
+    }
+
 
     /**
      * Utility method to get detailed progress information (for future features)
@@ -873,6 +651,9 @@ public class ProgressStreakActivity extends AppCompatActivity {
     private void showMilestoneCelebration(int streak) {
         String celebrationMessage = getMilestoneMessage(streak);
 
+        // Trigger the enhanced flame celebration
+        triggerMilestoneCelebration(streak);
+
         // Create and show milestone dialog
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("🎉 Milestone Achieved!")
@@ -880,9 +661,46 @@ public class ProgressStreakActivity extends AppCompatActivity {
                 .setPositiveButton("Keep Going!", (dialog, which) -> dialog.dismiss())
                 .setCancelable(false)
                 .show();
+    }
 
-        // Add special milestone animation
-        addMilestoneAnimation();
+    /**
+     * NEW: Method to manually trigger flame animation (for testing or user interaction)
+     */
+    public void onFlameIconClicked(View view) {
+        if (flameAnimator != null) {
+            int currentStreak = (userStats != null) ? userStats.currentStreak :
+                    (currentUser != null) ? currentUser.getCurrentStreak() : 0;
+
+            // Trigger a burst animation on click
+            flameAnimator.pauseAnimations();
+
+            ivFlameIcon.animate()
+                    .scaleX(1.3f)
+                    .scaleY(1.3f)
+                    .setDuration(150)
+                    .withEndAction(() -> {
+                        ivFlameIcon.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(150)
+                                .withEndAction(() -> {
+                                    flameAnimator.animateForStreak(currentStreak);
+                                })
+                                .start();
+                    })
+                    .start();
+        }
+    }
+
+    /**
+     * NEW: Method to get animation status info (for debugging)
+     */
+    private String getAnimationStatusInfo() {
+        if (flameAnimator != null) {
+            return String.format("Animation Status - Active: %s, Streak Level: %d",
+                    flameAnimator.isAnimating(), flameAnimator.getCurrentStreakLevel());
+        }
+        return "Enhanced animator not initialized";
     }
 
     /**
