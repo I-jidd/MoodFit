@@ -70,6 +70,8 @@ public class HomeActivity extends AppCompatActivity {
 
         // Show welcome animation for first-time users
         checkAndShowWelcomeAnimation();
+
+        dataManager.resetTodaysWorkout();
     }
 
     /**

@@ -70,34 +70,28 @@ public class DataManager {
     public void updateUserStreak() {
         User user = getCurrentUser();
 
-        // Get current date components
-        Calendar today = Calendar.getInstance();
-        Calendar lastWorkout = Calendar.getInstance();
-        lastWorkout.setTimeInMillis(user.getLastWorkoutDate());
-
-        // Check if user has worked out today
-        boolean workedOutToday = isSameDay(today, lastWorkout);
-
-        if (workedOutToday) {
-            // Don't increment streak if already worked out today
-            return;
-        }
+        // ✅ REMOVED the duplicate "worked out today" check
+        // This method should only be called when we want to update the streak
 
         // Check if this is consecutive day
+        Calendar today = Calendar.getInstance();
         Calendar yesterday = Calendar.getInstance();
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
+
+        Calendar lastWorkout = Calendar.getInstance();
+        lastWorkout.setTimeInMillis(user.getLastWorkoutDate());
 
         if (isSameDay(yesterday, lastWorkout) || user.getCurrentStreak() == 0) {
             // Consecutive day or starting new streak
             int oldStreak = user.getCurrentStreak();
             user.incrementStreak();
-            android.util.Log.d(TAG, "Streak incremented from " + oldStreak + " to " + user.getCurrentStreak());
+            android.util.Log.d(TAG, "🔥 Streak incremented from " + oldStreak + " to " + user.getCurrentStreak());
         } else {
             // Reset streak if gap is more than 1 day
             int oldStreak = user.getCurrentStreak();
             user.resetStreak();
             user.incrementStreak(); // Start new streak with today
-            android.util.Log.d(TAG, "Streak reset and restarted. Was " + oldStreak + ", now " + user.getCurrentStreak());
+            android.util.Log.d(TAG, "🔥 Streak reset and restarted. Was " + oldStreak + ", now " + user.getCurrentStreak());
         }
 
         updateUser(user);
@@ -118,11 +112,36 @@ public class DataManager {
 
             // Update user stats
             User user = getCurrentUser();
+
+            // Add to DataManager.recordWorkoutCompletion() before the other debug logs
+            long timeDiff = System.currentTimeMillis() - user.getLastWorkoutDate();
+            long minutesAgo = timeDiff / (1000 * 60);
+            android.util.Log.d(TAG, "🔥 DEBUG - last workout was " + minutesAgo + " minutes ago");
+
+// Convert to readable date
+            java.util.Date lastWorkoutTime = new java.util.Date(user.getLastWorkoutDate());
+            android.util.Log.d(TAG, "🔥 DEBUG - last workout time: " + lastWorkoutTime.toString());
+
+            // ✅ ADD THESE DEBUG LOGS
+            android.util.Log.d(TAG, "🔥 DEBUG - user.lastWorkoutDate: " + user.getLastWorkoutDate());
+            android.util.Log.d(TAG, "🔥 DEBUG - current time: " + System.currentTimeMillis());
+            android.util.Log.d(TAG, "🔥 DEBUG - hasWorkedOutToday BEFORE: " + user.hasWorkedOutToday());
+
+            // Check if worked out today BEFORE updating lastWorkoutDate
+            boolean alreadyWorkedOutToday = user.hasWorkedOutToday();
+
+            // Update workout stats (this sets lastWorkoutDate to now)
             user.addWorkout(session.getDurationMinutes());
 
+            // ✅ ADD THIS DEBUG LOG TOO
+            android.util.Log.d(TAG, "🔥 DEBUG - hasWorkedOutToday AFTER: " + user.hasWorkedOutToday());
+
             // Only update streak if this is their first workout today
-            if (!user.hasWorkedOutToday()) {
+            if (!alreadyWorkedOutToday) {
+                android.util.Log.d(TAG, "🔥 UPDATING STREAK - first workout today!");
                 updateUserStreak();
+            } else {
+                android.util.Log.d(TAG, "🔥 SKIPPING STREAK UPDATE - already worked out today");
             }
 
             updateUser(user);
@@ -136,6 +155,17 @@ public class DataManager {
 
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error recording workout completion", e);
+        }
+    }
+
+    public void resetTodaysWorkout() {
+        try {
+            User user = getCurrentUser();
+            user.setLastWorkoutDate(0); // Reset to never worked out
+            updateUser(user);
+            android.util.Log.d(TAG, "🔥 RESET - lastWorkoutDate set to 0");
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error resetting workout date", e);
         }
     }
 
@@ -374,38 +404,6 @@ public class DataManager {
             android.util.Log.e(TAG, "Error during app initialization", e);
         }
     }
-
-    /**
-     * Check if user setup is complete
-     */
-    public boolean isUserSetupComplete() {
-        return prefsHelper.isOnboardingCompleted() && prefsHelper.hasUser();
-    }
-
-    // ==================== EXERCISE MANAGEMENT ====================
-
-    /**
-     * Get exercise recommendations based on user preferences and mood
-     */
-    public List<Exercise> getRecommendedExercises(MoodType mood, DifficultyLevel difficulty, int count) {
-        // This would integrate with your exercise generation logic
-        // For now, return empty list as exercises are generated in activities
-        return new ArrayList<>();
-    }
-
-    /**
-     * Record exercise completion
-     */
-    public void recordExerciseCompletion(Exercise exercise, int actualDuration) {
-        try {
-            // You could track individual exercise completions here
-            // For analytics or recommendation improvements
-            android.util.Log.d(TAG, "Exercise completed: " + exercise.getName() + " (" + actualDuration + "min)");
-        } catch (Exception e) {
-            android.util.Log.e(TAG, "Error recording exercise completion", e);
-        }
-    }
-
     // ==================== DATA ANALYTICS ====================
 
     /**

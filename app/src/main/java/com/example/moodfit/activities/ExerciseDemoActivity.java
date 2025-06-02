@@ -546,12 +546,17 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        android.util.Log.d(TAG, "🔥 EXERCISE DEMO onActivityResult - requestCode: " + requestCode + ", resultCode: " + resultCode);
 
         if (requestCode == 2001) { // Timer result
             if (resultCode == RESULT_OK) {
+                android.util.Log.d(TAG, "🔥 Timer returned RESULT_OK - calling handleExerciseCompletion");
+
                 // Exercise completed successfully
                 handleExerciseCompletion(data);
             } else if (resultCode == RESULT_CANCELED) {
+                android.util.Log.d(TAG, "🔥 Timer returned RESULT_CANCELED");
+
                 // Exercise was cancelled - STAY on demo screen, don't finish
                 handleExerciseCancellation(data);
             }
@@ -564,6 +569,9 @@ public class ExerciseDemoActivity extends AppCompatActivity {
     private void handleExerciseCompletion(Intent data) {
         // Increment completed exercises
         exercisesCompleted++;
+
+        android.util.Log.d(TAG, "🔥 EXERCISE COMPLETED - exercisesCompleted now: " + exercisesCompleted);
+
 
         // Add calories for this exercise
         totalCaloriesBurned += exerciseCalories;
@@ -673,6 +681,9 @@ public class ExerciseDemoActivity extends AppCompatActivity {
      * Show workout completion screen - UPDATED with real workout data
      */
     private void showWorkoutCompletion() {
+
+        android.util.Log.d(TAG, "🔥 SHOW WORKOUT COMPLETION - exercisesCompleted: " + exercisesCompleted);
+
         // Calculate actual workout duration
         long workoutEndTime = System.currentTimeMillis();
         int actualDurationMinutes = (int) ((workoutEndTime - workoutStartTime) / (1000 * 60));
@@ -695,6 +706,8 @@ public class ExerciseDemoActivity extends AppCompatActivity {
         completionIntent.putExtra("exercises_completed", exercisesCompleted);
         completionIntent.putExtra("calories_burned", totalCaloriesBurned);
         completionIntent.putExtra("exercises_skipped", hasSkippedExercises);
+
+        android.util.Log.d(TAG, "🔥 Starting WorkoutCompleteActivity with exercises_completed: " + exercisesCompleted);
 
         startActivity(completionIntent);
         overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

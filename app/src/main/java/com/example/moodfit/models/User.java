@@ -2,6 +2,8 @@ package com.example.moodfit.models;
 
 import com.example.moodfit.models.enums.DifficultyLevel;
 
+import java.util.Calendar;
+
 public class User {
     private String userId;
     private String username;
@@ -68,9 +70,18 @@ public class User {
     }
 
     public boolean hasWorkedOutToday() {
-        long today = System.currentTimeMillis();
-        long dayInMillis = 24 * 60 * 60 * 1000;
-        return (today - lastWorkoutDate) < dayInMillis;
+        // If never worked out (lastWorkoutDate is 0), return false
+        if (lastWorkoutDate == 0) {
+            return false;
+        }
+
+        Calendar today = Calendar.getInstance();
+        Calendar lastWorkout = Calendar.getInstance();
+        lastWorkout.setTimeInMillis(this.lastWorkoutDate);
+
+        // Check if same calendar day (not 24-hour period)
+        return today.get(Calendar.YEAR) == lastWorkout.get(Calendar.YEAR) &&
+                today.get(Calendar.DAY_OF_YEAR) == lastWorkout.get(Calendar.DAY_OF_YEAR);
     }
 
     public void recordAppOpen() {

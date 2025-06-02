@@ -112,6 +112,10 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
             exercisesCompleted = intent.getIntExtra("exercises_completed", totalExercises);
             totalCaloriesBurned = intent.getIntExtra("calories_burned", calculateEstimatedCalories());
             wasSkipped = intent.getBooleanExtra("exercises_skipped", false);
+
+            android.util.Log.d(TAG, "🔥 WORKOUT COMPLETE - extracted exercisesCompleted: " + exercisesCompleted);
+            android.util.Log.d(TAG, "🔥 WORKOUT COMPLETE - totalExercises: " + totalExercises);
+            android.util.Log.d(TAG, "🔥 WORKOUT COMPLETE - actualDuration: " + actualDuration);
         }
     }
 
@@ -145,6 +149,8 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
      */
     private void recordWorkoutCompletion() {
         try {
+            android.util.Log.d(TAG, "🔥 RECORD WORKOUT - dataManager exists: " + (dataManager != null));
+            android.util.Log.d(TAG, "🔥 RECORD WORKOUT - exercisesCompleted: " + exercisesCompleted);
             if (dataManager == null || exercisesCompleted == 0) {
                 android.util.Log.w(TAG, "Skipping workout recording - no exercises completed");
                 return;
@@ -152,6 +158,8 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
 
             // Create a workout session for recording
             WorkoutSession session = createWorkoutSession();
+            android.util.Log.d(TAG, "🔥 Created session - completed: " + session.isCompleted());
+
 
             // Record using DataManager (handles all business logic)
             dataManager.recordWorkoutCompletion(session);
@@ -160,7 +168,7 @@ public class WorkoutCompleteActivity extends AppCompatActivity {
             currentUser = dataManager.getCurrentUser();
             updatedStats = dataManager.getUserStats();
 
-            android.util.Log.d(TAG, "Workout recorded successfully via DataManager");
+            android.util.Log.d(TAG, "🔥 FINAL STREAK: " + (updatedStats != null ? updatedStats.currentStreak : "null"));
 
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error recording workout completion", e);

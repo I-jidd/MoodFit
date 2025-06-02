@@ -559,6 +559,9 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
             isTimerPaused = false;
             completedCycles++;
 
+
+            android.util.Log.d(TAG, "🔥 TIMER FINISHED - completedCycles: " + completedCycles);
+
             // Play completion sound
             playCompletionSound();
 
@@ -726,6 +729,9 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
      * Finish workout and return to previous activity - UPDATED
      */
     private void finishWorkout() {
+
+        android.util.Log.d(TAG, "🔥 FINISH WORKOUT - completedCycles: " + completedCycles);
+
         // Calculate total workout time
         long totalTime = System.currentTimeMillis() - sessionStartTime;
         int actualDurationMinutes = (int) (totalTime / (1000 * 60));
@@ -739,8 +745,12 @@ public class WorkoutTimerActivity extends AppCompatActivity implements WorkoutTi
 
         if (completedCycles > 0) {
             // Workout was completed successfully
+            android.util.Log.d(TAG, "🔥 Setting RESULT_OK");
+
             setResult(RESULT_OK, resultIntent);
         } else {
+            android.util.Log.d(TAG, "🔥 Setting RESULT_CANCELED - no cycles completed");
+
             // Workout was cancelled
             setResult(RESULT_CANCELED, resultIntent);
         }
