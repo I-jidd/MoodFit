@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Enhanced Flame Animation System
+ * Enhanced Flame Animation System - FIXED VERSION
  * Creates realistic, dynamic flame animations that respond to streak levels
  * with organic movement patterns and visual effects
  */
@@ -47,15 +47,15 @@ public class EnhancedFlameAnimator {
     private static final float MAX_ROTATION = 12f;  // Slightly reduced rotation
     private static final float GLOW_INTENSITY = 0.6f;
 
-    // Flame colors for different streak levels
+    // FIXED: Better color progression for different streak levels
     private int[] flameColors = {
-            Color.parseColor("#94A3B8"), // Gray for no streak
-            Color.parseColor("#F59E0B"), // Orange for starting
-            Color.parseColor("#F97316"), // Deeper orange
-            Color.parseColor("#EF4444"), // Red-orange
-            Color.parseColor("#DC2626"), // Red
-            Color.parseColor("#B91C1C"), // Deep red
-            Color.parseColor("#7C2D12")  // Epic dark red
+            Color.parseColor("#94A3B8"), // Gray for no streak (0)
+            Color.parseColor("#F59E0B"), // Orange for 1-2 days
+            Color.parseColor("#F97316"), // Deeper orange for 3-5 days
+            Color.parseColor("#EF4444"), // Red-orange for 6-10 days
+            Color.parseColor("#DC2626"), // Red for 11-20 days
+            Color.parseColor("#B91C1C"), // Deep red for 21-30 days
+            Color.parseColor("#7C2D12")  // Epic dark red for 30+ days
     };
 
     public EnhancedFlameAnimator(Context context, ImageView flameIcon, View glowBackground) {
@@ -66,8 +66,27 @@ public class EnhancedFlameAnimator {
         this.random = new Random();
         this.activeAnimators = new ArrayList<>();
 
-        // Initialize flame to default state
-        resetFlameToDefault();
+        // FIXED: Don't reset to default immediately - let the calling code set initial state
+        initializeFlameState();
+    }
+
+    /**
+     * FIXED: Initialize flame without clearing colors
+     */
+    private void initializeFlameState() {
+        if (flameIcon != null) {
+            flameIcon.setScaleX(1.0f);
+            flameIcon.setScaleY(1.0f);
+            flameIcon.setRotation(0f);
+            flameIcon.setTranslationX(0f);
+            flameIcon.setTranslationY(0f);
+            // Don't clear color filter or set alpha here - let animateForStreak handle it
+        }
+
+        if (glowBackground != null) {
+            glowBackground.setScaleX(1.0f);
+            glowBackground.setScaleY(1.0f);
+        }
     }
 
     /**
@@ -78,9 +97,9 @@ public class EnhancedFlameAnimator {
         // Stop any existing animations
         stopAllAnimations();
 
-        currentStreakLevel = Math.min(streakCount, 6); // Cap at 6 levels
+        currentStreakLevel = streakCount;
 
-        // Apply streak-appropriate styling
+        // Apply streak-appropriate styling FIRST
         applyStreakStyling(streakCount);
 
         // Start appropriate animation pattern
@@ -104,23 +123,48 @@ public class EnhancedFlameAnimator {
     }
 
     /**
-     * Apply visual styling based on streak level
+     * FIXED: Better color selection logic
      */
     private void applyStreakStyling(int streakCount) {
-        int colorIndex = Math.min(streakCount / 5, flameColors.length - 1);
+        // Better color progression
+        int colorIndex;
+        if (streakCount == 0) {
+            colorIndex = 0; // Gray
+        } else if (streakCount <= 2) {
+            colorIndex = 1; // Orange
+        } else if (streakCount <= 5) {
+            colorIndex = 2; // Deeper orange
+        } else if (streakCount <= 10) {
+            colorIndex = 3; // Red-orange
+        } else if (streakCount <= 20) {
+            colorIndex = 4; // Red
+        } else if (streakCount <= 30) {
+            colorIndex = 5; // Deep red
+        } else {
+            colorIndex = 6; // Epic dark red
+        }
+
         int flameColor = flameColors[colorIndex];
 
         // Apply color filter to flame
         flameIcon.setColorFilter(flameColor);
 
-        // Set base alpha based on streak
-        float baseAlpha = streakCount == 0 ? 0.3f : Math.min(0.6f + (streakCount * 0.05f), 1.0f);
+        // FIXED: Better alpha progression
+        float baseAlpha;
+        if (streakCount == 0) {
+            baseAlpha = 0.4f; // More visible than 0.3f
+        } else if (streakCount == 1) {
+            baseAlpha = 0.7f; // Good visibility for first day
+        } else {
+            baseAlpha = Math.min(0.8f + (streakCount * 0.02f), 1.0f);
+        }
         flameIcon.setAlpha(baseAlpha);
 
         // Configure glow background if available
         if (glowBackground != null) {
             glowBackground.setBackground(createGlowDrawable(flameColor, streakCount));
-            glowBackground.setAlpha(streakCount == 0 ? 0.1f : Math.min(streakCount * 0.1f, GLOW_INTENSITY));
+            float glowAlpha = streakCount == 0 ? 0.2f : Math.min(0.3f + (streakCount * 0.03f), GLOW_INTENSITY);
+            glowBackground.setAlpha(glowAlpha);
         }
     }
 
@@ -128,7 +172,7 @@ public class EnhancedFlameAnimator {
      * No streak - gentle dormant animation
      */
     private void animateNoStreak() {
-        ObjectAnimator breathe = ObjectAnimator.ofFloat(flameIcon, "alpha", 0.2f, 0.4f);
+        ObjectAnimator breathe = ObjectAnimator.ofFloat(flameIcon, "alpha", 0.3f, 0.5f);
         breathe.setDuration(3000);
         breathe.setRepeatCount(ValueAnimator.INFINITE);
         breathe.setRepeatMode(ValueAnimator.REVERSE);
@@ -139,10 +183,10 @@ public class EnhancedFlameAnimator {
     }
 
     /**
-     * Day 1 - gentle awakening flame
+     * FIXED: Day 1 - gentle awakening flame (uncommented and improved)
      */
     private void animateNewbieFlame() {
-        // Gentle scale breathing - set repeat properties on individual animators
+        // Gentle scale breathing
         ObjectAnimator scaleX = ObjectAnimator.ofFloat(flameIcon, "scaleX", 1.0f, 1.08f);
         scaleX.setDuration(2000);
         scaleX.setRepeatCount(ValueAnimator.INFINITE);
@@ -155,7 +199,7 @@ public class EnhancedFlameAnimator {
         scaleY.setRepeatMode(ValueAnimator.REVERSE);
         scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
 
-        ObjectAnimator alpha = ObjectAnimator.ofFloat(flameIcon, "alpha", 0.6f, 0.9f);
+        ObjectAnimator alpha = ObjectAnimator.ofFloat(flameIcon, "alpha", 0.7f, 0.9f);
         alpha.setDuration(2000);
         alpha.setRepeatCount(ValueAnimator.INFINITE);
         alpha.setRepeatMode(ValueAnimator.REVERSE);
@@ -745,7 +789,7 @@ public class EnhancedFlameAnimator {
     }
 
     /**
-     * Reset flame to default state
+     * FIXED: Reset flame to visible state (don't clear color filter)
      */
     private void resetFlameToDefault() {
         if (flameIcon != null) {
@@ -754,14 +798,15 @@ public class EnhancedFlameAnimator {
             flameIcon.setRotation(0f);
             flameIcon.setTranslationX(0f);
             flameIcon.setTranslationY(0f);
-            flameIcon.setAlpha(0.3f);
-            flameIcon.clearColorFilter();
+            // FIXED: Don't clear color filter or set very low alpha
+            // flameIcon.setAlpha(0.3f);      // REMOVED - let applyStreakStyling handle this
+            // flameIcon.clearColorFilter();  // REMOVED - let applyStreakStyling handle this
         }
 
         if (glowBackground != null) {
             glowBackground.setScaleX(1.0f);
             glowBackground.setScaleY(1.0f);
-            glowBackground.setAlpha(0.1f);
+            // Don't set alpha here either
         }
     }
 

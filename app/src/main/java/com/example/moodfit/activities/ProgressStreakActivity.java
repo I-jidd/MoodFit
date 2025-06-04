@@ -222,7 +222,7 @@ public class ProgressStreakActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             android.util.Log.e(TAG, "Error updating weekly progress", e);
-            tvWeekCount.setText("0 days");
+            tvWeekCount.setText("0 exercise");
         }
     }
 
@@ -233,9 +233,9 @@ public class ProgressStreakActivity extends AppCompatActivity {
         if (workoutCount == 0) {
             return "Start this week!";
         } else if (workoutCount == 1) {
-            return "1 day";
+            return "1 exercise";
         } else {
-            return workoutCount + " days";
+            return workoutCount + " exercises";
         }
     }
 
